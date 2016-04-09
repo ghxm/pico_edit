@@ -27,7 +27,7 @@
 $(document).ready(function() {
 	$('#pushpullform').submit(function(e) {
 		e.preventDefault();
-		$.post('cms/pushpull', $('#pushpullform').serialize(), function(data) {
+		$.post('pico_edit/pushpull', $('#pushpullform').serialize(), function(data) {
 			$('.popupcontent').html(data);
 		});
 	});

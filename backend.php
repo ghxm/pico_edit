@@ -33,7 +33,7 @@ class Backend {
 	{
     // If the request is anything to do with backend, then
     // we start the PHP session
-    if( substr( $url, 0, 3 ) == 'cms' ) {
+    if( substr( $url, 0, 9 ) == 'pico_edit' ) {
       if(function_exists('session_status')) {
         if (session_status() == PHP_SESSION_NONE) {
           session_start();
@@ -42,24 +42,24 @@ class Backend {
         session_start();
       }
     }
-		// Are we looking for /cms?
-		if($url == 'cms') $this->is_admin = true;
-		if($url == 'cms/new') $this->do_new();
-		if($url == 'cms/open') $this->do_open();
-		if($url == 'cms/save') $this->do_save();
-		if($url == 'cms/delete') $this->do_delete();
-		if($url == 'cms/logout') $this->is_logout = true;
-		if($url == 'cms/files') $this->do_filemgr();
-    if($url == 'cms/commit') $this->do_commit();
-    if($url == 'cms/git') $this->do_git();
-    if($url == 'cms/pushpull') $this->do_pushpull();
+		// Are we looking for /pico_edit?
+		if($url == 'pico_edit') $this->is_admin = true;
+		if($url == 'pico_edit/new') $this->do_new();
+		if($url == 'pico_edit/open') $this->do_open();
+		if($url == 'pico_edit/save') $this->do_save();
+		if($url == 'pico_edit/delete') $this->do_delete();
+		if($url == 'pico_edit/logout') $this->is_logout = true;
+		if($url == 'pico_edit/files') $this->do_filemgr();
+    if($url == 'pico_edit/commit') $this->do_commit();
+    if($url == 'pico_edit/git') $this->do_git();
+    if($url == 'pico_edit/pushpull') $this->do_pushpull();
 	}
 
 	public function before_render(&$twig_vars, &$twig)
 	{
 		if($this->is_logout){
 			session_destroy();
-			header('Location: '. $twig_vars['base_url'] .'/cms');
+			header('Location: '. $twig_vars['base_url'] .'/pico_edit');
 			exit;
 		}
 
@@ -290,7 +290,7 @@ Date: '. date('j F Y') .'
 
     private function do_commit_get()
     {
-      if(file_exists('./plugins/cms/commitform.html')) {
+      if(file_exists('./plugins/pico_edit/commitform.html')) {
         # Do the git stuff...
         require_once 'Git-php-lib';
         $repo = Git::open('.');
@@ -302,7 +302,7 @@ Date: '. date('j F Y') .'
           $status = array('Failed to run git-status: ' . $e->getMessage());
         }
 
-        $loader = new Twig_Loader_Filesystem('./plugins/cms');
+        $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
         $twig = new Twig_Environment($loader, array('cache' => null));
         $twig->addExtension(new Twig_Extension_Debug());
         $twig_vars = array(
@@ -370,8 +370,8 @@ Date: '. date('j F Y') .'
       }
       #$commit_output = preg_replace('/\r?\n\r?/', "<br>\n", $add_output);
 
-      if(file_exists('./plugins/cms/commitresponse.html')) {
-        $loader = new Twig_Loader_Filesystem('./plugins/cms');
+      if(file_exists('./plugins/pico_edit/commitresponse.html')) {
+        $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
         $twig = new Twig_Environment($loader, array('cache' => null));
         $twig->addExtension(new Twig_Extension_Debug());
         $twig_vars = array(
@@ -397,7 +397,7 @@ Date: '. date('j F Y') .'
 
     private function do_pushpull_get()
     {
-      if(file_exists('./plugins/cms/pushpullform.html')) {
+      if(file_exists('./plugins/pico_edit/pushpullform.html')) {
         # Do the git stuff...
         require_once 'Git-php-lib';
         $repo = Git::open('.');
@@ -410,7 +410,7 @@ Date: '. date('j F Y') .'
           $remotes = array('Failed to get git sources: ' . $e->getMessage());
         }
 
-        $loader = new Twig_Loader_Filesystem('./plugins/cms');
+        $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
         $twig = new Twig_Environment($loader, array('cache' => null));
         $twig->addExtension(new Twig_Extension_Debug());
         $twig_vars = array(
@@ -425,7 +425,7 @@ Date: '. date('j F Y') .'
 
     private function do_pushpull_post()
     {
-      if(file_exists('./plugins/cms/pushpullresponse.html')) {
+      if(file_exists('./plugins/pico_edit/pushpullresponse.html')) {
         # Do the git stuff...
         require_once 'Git-php-lib';
         $repo = Git::open('.');
@@ -463,7 +463,7 @@ Date: '. date('j F Y') .'
         }
 
         # And do output...
-        $loader = new Twig_Loader_Filesystem('./plugins/cms');
+        $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
         $twig = new Twig_Environment($loader, array('cache' => null));
         $twig->addExtension(new Twig_Extension_Debug());
         $twig_vars = array(
