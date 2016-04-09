@@ -32,7 +32,7 @@ Commit message:<br>
 <script>
 	$('#commitform').submit(function(e) {
 		e.preventDefault();
-		$.post('peeked/commit', $('#commitform').serialize(), function(data) {
+		$.post('cms/commit', $('#commitform').serialize(), function(data) {
 			$('.popupcontent').html(data);
 		});
 	});

@@ -1,14 +1,14 @@
 <?php
-
 /**
- * Editor plugin for Pico
+ * Backend plugin for Pico CMS
  *
- * @author Gilbert Pellegrom
- * @link http://pico.dev7studios.com
+ * @author Mattia Roccoberton
+ * @link http://blocknot.es
  * @license http://opensource.org/licenses/MIT
- * @version 1.1
+ * @version 0.2
  */
-class Peeked {
+
+class Backend {
 
 	private $is_admin;
 	private $is_logout;
@@ -22,18 +22,18 @@ class Peeked {
 		$this->plugin_path = dirname(__FILE__);
 		$this->password = '';
 
-		if(file_exists($this->plugin_path .'/peeked_config.php')){
-			global $peeked_password;
-			include_once($this->plugin_path .'/peeked_config.php');
-			$this->password = $peeked_password;
+		if(file_exists($this->plugin_path .'/config.php')){
+			global $backend_password;
+			include_once($this->plugin_path .'/config.php');
+			$this->password = $backend_password;
 		}
 	}
 
 	public function request_url(&$url)
 	{
-    // If the request is anything to do with Peeked, then
+    // If the request is anything to do with backend, then
     // we start the PHP session
-    if(substr($url, 0, 6) == 'peeked') {
+    if( substr( $url, 0, 3 ) == 'cms' ) {
       if(function_exists('session_status')) {
         if (session_status() == PHP_SESSION_NONE) {
           session_start();
@@ -42,24 +42,24 @@ class Peeked {
         session_start();
       }
     }
-		// Are we looking for /peeked?
-		if($url == 'peeked') $this->is_admin = true;
-		if($url == 'peeked/new') $this->do_new();
-		if($url == 'peeked/open') $this->do_open();
-		if($url == 'peeked/save') $this->do_save();
-		if($url == 'peeked/delete') $this->do_delete();
-		if($url == 'peeked/logout') $this->is_logout = true;
-		if($url == 'peeked/files') $this->do_filemgr();
-    if($url == 'peeked/commit') $this->do_commit();
-    if($url == 'peeked/git') $this->do_git();
-    if($url == 'peeked/pushpull') $this->do_pushpull();
+		// Are we looking for /cms?
+		if($url == 'cms') $this->is_admin = true;
+		if($url == 'cms/new') $this->do_new();
+		if($url == 'cms/open') $this->do_open();
+		if($url == 'cms/save') $this->do_save();
+		if($url == 'cms/delete') $this->do_delete();
+		if($url == 'cms/logout') $this->is_logout = true;
+		if($url == 'cms/files') $this->do_filemgr();
+    if($url == 'cms/commit') $this->do_commit();
+    if($url == 'cms/git') $this->do_git();
+    if($url == 'cms/pushpull') $this->do_pushpull();
 	}
 
 	public function before_render(&$twig_vars, &$twig)
 	{
 		if($this->is_logout){
 			session_destroy();
-			header('Location: '. $twig_vars['base_url'] .'/peeked');
+			header('Location: '. $twig_vars['base_url'] .'/cms');
 			exit;
 		}
 
@@ -68,16 +68,16 @@ class Peeked {
 			$loader = new Twig_Loader_Filesystem($this->plugin_path);
 			$twig_editor = new Twig_Environment($loader, $twig_vars);
 			if(!$this->password){
-				$twig_vars['login_error'] = 'No password set for the Pico Editor.';
+				$twig_vars['login_error'] = 'No password set for the backend.';
 				echo $twig_editor->render('login.html', $twig_vars); // Render login.html
 				exit;
 			}
 
-			if(!isset($_SESSION['peeked_logged_in']) || !$_SESSION['peeked_logged_in']){
+			if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']){
 				if(isset($_POST['password'])){
 					if(sha1($_POST['password']) == $this->password){
-						$_SESSION['peeked_logged_in'] = true;
-						$_SESSION['peeked_config'] = $twig_vars['config'];
+						$_SESSION['backend_logged_in'] = true;
+						$_SESSION['backend_config'] = $twig_vars['config'];
 					} else {
 						$twig_vars['login_error'] = 'Invalid password.';
 						echo $twig_editor->render('login.html', $twig_vars); // Render login.html
@@ -104,7 +104,7 @@ class Peeked {
     {
 
 		$file_components = parse_url($file_url); // inner
-		$base_components = parse_url($_SESSION['peeked_config']['base_url']);
+		$base_components = parse_url($_SESSION['backend_config']['base_url']);
 		$file_path = rtrim($file_components['path'], '/');
 		$base_path = rtrim($base_components['path'], '/');
 
@@ -125,7 +125,7 @@ class Peeked {
 
     private function do_new()
     {
-        if(!isset($_SESSION['peeked_logged_in']) || !$_SESSION['peeked_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+        if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
         $title = isset($_POST['title']) && $_POST['title'] ? strip_tags($_POST['title']) : '';
         $dir = isset($_POST['dir']) && $_POST['dir'] ? strip_tags($_POST['dir']) : '';
 	if(substr($dir,0,1) != '/') {
@@ -209,7 +209,7 @@ Date: '. date('j F Y') .'
 
     private function do_open()
     {
-        if(!isset($_SESSION['peeked_logged_in']) || !$_SESSION['peeked_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+        if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
         $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
         $file = self::get_real_filename($file_url);
         if(!$file) die('Error: Invalid file');
@@ -221,7 +221,7 @@ Date: '. date('j F Y') .'
 
     private function do_save()
     {
-        if(!isset($_SESSION['peeked_logged_in']) || !$_SESSION['peeked_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+        if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
         $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
         $file = self::get_real_filename($file_url);
         if(!$file) die('Error: Invalid file');
@@ -242,7 +242,7 @@ Date: '. date('j F Y') .'
 
     private function do_delete()
     {
-        if(!isset($_SESSION['peeked_logged_in']) || !$_SESSION['peeked_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+        if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
         $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
         $file = self::get_real_filename($file_url);
         if(!$file) die('Error: Invalid file');
@@ -253,7 +253,7 @@ Date: '. date('j F Y') .'
 
     private function do_filemgr()
     {
-      if(!isset($_SESSION['peeked_logged_in']) || !$_SESSION['peeked_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
       $dir = isset($_POST['dir']) && $_POST['dir'] ? strip_tags($_POST['dir']) : '';
       if(substr($dir,0,1) != '/') {
         $dir = "/$dir";
@@ -281,7 +281,7 @@ Date: '. date('j F Y') .'
 
     private function do_commit()
     {
-      if(!isset($_SESSION['peeked_logged_in']) || !$_SESSION['peeked_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
       if($_SERVER['REQUEST_METHOD'] == 'POST') {
         return $this->do_commit_post();
       }
@@ -290,7 +290,7 @@ Date: '. date('j F Y') .'
 
     private function do_commit_get()
     {
-      if(file_exists('./plugins/peeked/commitform.html')) {
+      if(file_exists('./plugins/cms/commitform.html')) {
         # Do the git stuff...
         require_once 'Git-php-lib';
         $repo = Git::open('.');
@@ -302,7 +302,7 @@ Date: '. date('j F Y') .'
           $status = array('Failed to run git-status: ' . $e->getMessage());
         }
 
-        $loader = new Twig_Loader_Filesystem('./plugins/peeked');
+        $loader = new Twig_Loader_Filesystem('./plugins/cms');
         $twig = new Twig_Environment($loader, array('cache' => null));
         $twig->addExtension(new Twig_Extension_Debug());
         $twig_vars = array(
@@ -311,7 +311,7 @@ Date: '. date('j F Y') .'
         $content = $twig->render('commitform.html', $twig_vars);
         die($content);
       } else {
-        die('Sorry, commitform.html was not found in the Peeked plugin. This is an installation problem.');
+        die('Sorry, commitform.html was not found in the backend plugin. This is an installation problem.');
       }
     }
 
@@ -340,7 +340,7 @@ Date: '. date('j F Y') .'
           }
         }
       }
-  
+
       $add_output = '';
       if(count($to_add) > 0) {
         try {
@@ -370,8 +370,8 @@ Date: '. date('j F Y') .'
       }
       #$commit_output = preg_replace('/\r?\n\r?/', "<br>\n", $add_output);
 
-      if(file_exists('./plugins/peeked/commitresponse.html')) {
-        $loader = new Twig_Loader_Filesystem('./plugins/peeked');
+      if(file_exists('./plugins/cms/commitresponse.html')) {
+        $loader = new Twig_Loader_Filesystem('./plugins/cms');
         $twig = new Twig_Environment($loader, array('cache' => null));
         $twig->addExtension(new Twig_Extension_Debug());
         $twig_vars = array(
@@ -382,13 +382,13 @@ Date: '. date('j F Y') .'
         $content = $twig->render('commitresponse.html', $twig_vars);
         die($content);
       } else {
-        die('Sorry, commitresponse.html was not found in the Peeked plugin. This is an installation problem.');
+        die('Sorry, commitresponse.html was not found in the backend plugin. This is an installation problem.');
       }
     }
 
     private function do_pushpull()
     {
-      if(!isset($_SESSION['peeked_logged_in']) || !$_SESSION['peeked_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
       if($_SERVER['REQUEST_METHOD'] == 'POST') {
         return $this->do_pushpull_post();
       }
@@ -397,7 +397,7 @@ Date: '. date('j F Y') .'
 
     private function do_pushpull_get()
     {
-      if(file_exists('./plugins/peeked/pushpullform.html')) {
+      if(file_exists('./plugins/cms/pushpullform.html')) {
         # Do the git stuff...
         require_once 'Git-php-lib';
         $repo = Git::open('.');
@@ -410,7 +410,7 @@ Date: '. date('j F Y') .'
           $remotes = array('Failed to get git sources: ' . $e->getMessage());
         }
 
-        $loader = new Twig_Loader_Filesystem('./plugins/peeked');
+        $loader = new Twig_Loader_Filesystem('./plugins/cms');
         $twig = new Twig_Environment($loader, array('cache' => null));
         $twig->addExtension(new Twig_Extension_Debug());
         $twig_vars = array(
@@ -419,13 +419,13 @@ Date: '. date('j F Y') .'
         $content = $twig->render('pushpullform.html', $twig_vars);
         die($content);
       } else {
-        die('Sorry, pushpullform.html was not found in the Peeked plugin. This is an installation problem.');
+        die('Sorry, pushpullform.html was not found in the backend plugin. This is an installation problem.');
       }
     }
 
     private function do_pushpull_post()
     {
-      if(file_exists('./plugins/peeked/pushpullresponse.html')) {
+      if(file_exists('./plugins/cms/pushpullresponse.html')) {
         # Do the git stuff...
         require_once 'Git-php-lib';
         $repo = Git::open('.');
@@ -463,7 +463,7 @@ Date: '. date('j F Y') .'
         }
 
         # And do output...
-        $loader = new Twig_Loader_Filesystem('./plugins/peeked');
+        $loader = new Twig_Loader_Filesystem('./plugins/cms');
         $twig = new Twig_Environment($loader, array('cache' => null));
         $twig->addExtension(new Twig_Extension_Debug());
         $twig_vars = array(
@@ -472,12 +472,12 @@ Date: '. date('j F Y') .'
         $content = $twig->render('pushpullresponse.html', $twig_vars);
         die($content);
       } else {
-        die('Sorry, pushpullresponse.html was not found in the Peeked plugin. This is an installation problem.');
+        die('Sorry, pushpullresponse.html was not found in the backend plugin. This is an installation problem.');
       }
     }
 
     private function do_git() {
-      if(!isset($_SESSION['peeked_logged_in']) || !$_SESSION['peeked_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
 
       $output = array(
         'have_git' => 0,

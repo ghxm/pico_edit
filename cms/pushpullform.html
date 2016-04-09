@@ -27,7 +27,7 @@
 $(document).ready(function() {
 	$('#pushpullform').submit(function(e) {
 		e.preventDefault();
-		$.post('peeked/pushpull', $('#pushpullform').serialize(), function(data) {
+		$.post('cms/pushpull', $('#pushpullform').serialize(), function(data) {
 			$('.popupcontent').html(data);
 		});
 	});
