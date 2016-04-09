@@ -10,27 +10,27 @@
 
 class Pico_Edit {
 
-	private $is_admin;
-	private $is_logout;
-	private $plugin_path;
-	private $password;
+  private $is_admin;
+  private $is_logout;
+  private $plugin_path;
+  private $password;
 
-	public function __construct()
-	{
-		$this->is_admin = false;
-		$this->is_logout = false;
-		$this->plugin_path = dirname(__FILE__);
-		$this->password = '';
+  public function __construct()
+  {
+    $this->is_admin = false;
+    $this->is_logout = false;
+    $this->plugin_path = dirname(__FILE__);
+    $this->password = '';
 
-		if(file_exists($this->plugin_path .'/config.php')){
-			global $backend_password;
-			include_once($this->plugin_path .'/config.php');
-			$this->password = $backend_password;
-		}
-	}
+    if(file_exists($this->plugin_path .'/config.php')){
+      global $backend_password;
+      include_once($this->plugin_path .'/config.php');
+      $this->password = $backend_password;
+    }
+  }
 
-	public function request_url(&$url)
-	{
+  public function request_url(&$url)
+  {
     // If the request is anything to do with backend, then
     // we start the PHP session
     if( substr( $url, 0, 9 ) == 'pico_edit' ) {
@@ -42,76 +42,76 @@ class Pico_Edit {
         session_start();
       }
     }
-		// Are we looking for /pico_edit?
-		if($url == 'pico_edit') $this->is_admin = true;
-		if($url == 'pico_edit/new') $this->do_new();
-		if($url == 'pico_edit/open') $this->do_open();
-		if($url == 'pico_edit/save') $this->do_save();
-		if($url == 'pico_edit/delete') $this->do_delete();
-		if($url == 'pico_edit/logout') $this->is_logout = true;
-		if($url == 'pico_edit/files') $this->do_filemgr();
+    // Are we looking for /pico_edit?
+    if($url == 'pico_edit') $this->is_admin = true;
+    if($url == 'pico_edit/new') $this->do_new();
+    if($url == 'pico_edit/open') $this->do_open();
+    if($url == 'pico_edit/save') $this->do_save();
+    if($url == 'pico_edit/delete') $this->do_delete();
+    if($url == 'pico_edit/logout') $this->is_logout = true;
+    if($url == 'pico_edit/files') $this->do_filemgr();
     if($url == 'pico_edit/commit') $this->do_commit();
     if($url == 'pico_edit/git') $this->do_git();
     if($url == 'pico_edit/pushpull') $this->do_pushpull();
-	}
+  }
 
-	public function before_render(&$twig_vars, &$twig)
-	{
-		if($this->is_logout){
-			session_destroy();
-			header('Location: '. $twig_vars['base_url'] .'/pico_edit');
-			exit;
-		}
+  public function before_render(&$twig_vars, &$twig)
+  {
+    if($this->is_logout){
+      session_destroy();
+      header('Location: '. $twig_vars['base_url'] .'/pico_edit');
+      exit;
+    }
 
-		if($this->is_admin){
-			header($_SERVER['SERVER_PROTOCOL'].' 200 OK'); // Override 404 header
-			$loader = new Twig_Loader_Filesystem($this->plugin_path);
-			$twig_editor = new Twig_Environment($loader, $twig_vars);
-			if(!$this->password){
-				$twig_vars['login_error'] = 'No password set for the backend.';
-				echo $twig_editor->render('login.html', $twig_vars); // Render login.html
-				exit;
-			}
+    if($this->is_admin){
+      header($_SERVER['SERVER_PROTOCOL'].' 200 OK'); // Override 404 header
+      $loader = new Twig_Loader_Filesystem($this->plugin_path);
+      $twig_editor = new Twig_Environment($loader, $twig_vars);
+      if(!$this->password){
+        $twig_vars['login_error'] = 'No password set for the backend.';
+        echo $twig_editor->render('login.html', $twig_vars); // Render login.html
+        exit;
+      }
 
-			if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']){
-				if(isset($_POST['password'])){
-					if(sha1($_POST['password']) == $this->password){
-						$_SESSION['backend_logged_in'] = true;
-						$_SESSION['backend_config'] = $twig_vars['config'];
-					} else {
-						$twig_vars['login_error'] = 'Invalid password.';
-						echo $twig_editor->render('login.html', $twig_vars); // Render login.html
-						exit;
-					}
-				} else {
-					echo $twig_editor->render('login.html', $twig_vars); // Render login.html
-					exit;
-				}
-			}
+      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']){
+        if(isset($_POST['password'])){
+          if(sha1($_POST['password']) == $this->password){
+            $_SESSION['backend_logged_in'] = true;
+            $_SESSION['backend_config'] = $twig_vars['config'];
+          } else {
+            $twig_vars['login_error'] = 'Invalid password.';
+            echo $twig_editor->render('login.html', $twig_vars); // Render login.html
+            exit;
+          }
+        } else {
+          echo $twig_editor->render('login.html', $twig_vars); // Render login.html
+          exit;
+        }
+      }
 
-			echo $twig_editor->render('editor.html', $twig_vars); // Render editor.html
-			exit; // Don't continue to render template
-		}
-	}
+      echo $twig_editor->render('editor.html', $twig_vars); // Render editor.html
+      exit; // Don't continue to render template
+    }
+  }
 
-	/**
-	 * Returns real file name to be edited.
-	 *
-	 * @param string $file_url the file URL to be edited
-	 * @return string
-	 */
-	private static function get_real_filename($file_url)
+  /**
+   * Returns real file name to be edited.
+   *
+   * @param string $file_url the file URL to be edited
+   * @return string
+   */
+  private static function get_real_filename($file_url)
     {
 
-		$file_components = parse_url($file_url); // inner
-		$base_components = parse_url($_SESSION['backend_config']['base_url']);
-		$file_path = rtrim($file_components['path'], '/');
-		$base_path = rtrim($base_components['path'], '/');
+    $file_components = parse_url($file_url); // inner
+    $base_components = parse_url($_SESSION['backend_config']['base_url']);
+    $file_path = rtrim($file_components['path'], '/');
+    $base_path = rtrim($base_components['path'], '/');
 
-		if(empty($file_path) || $file_path === $base_path)
+    if(empty($file_path) || $file_path === $base_path)
         {
             return 'index';
-		}
+    }
         else
         {
             $file_path = strip_tags(substr($file_path, strlen($base_path)));
@@ -120,7 +120,7 @@ class Pico_Edit {
 
             return $file_path;
         }
-	}
+  }
 
 
     private function do_new()
@@ -128,15 +128,15 @@ class Pico_Edit {
         if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
         $title = isset($_POST['title']) && $_POST['title'] ? strip_tags($_POST['title']) : '';
         $dir = isset($_POST['dir']) && $_POST['dir'] ? strip_tags($_POST['dir']) : '';
-	if(substr($dir,0,1) != '/') {
-	  $dir = "/$dir";
-	}
-	$dir = preg_replace('/\/+/', '/', $dir);
+  if(substr($dir,0,1) != '/') {
+    $dir = "/$dir";
+  }
+  $dir = preg_replace('/\/+/', '/', $dir);
 
         $contentDir = CONTENT_DIR . $dir;
         if($contentDir[strlen(count($contentDir)-1)] != '/') {
-	  $contentDir .= '/';
-	}
+    $contentDir .= '/';
+  }
 
         if(!is_dir($contentDir)) {
             if (!mkdir($contentDir, 0777, true)) {
@@ -147,45 +147,45 @@ class Pico_Edit {
         $file = $this->slugify(basename($title));
         if(!$file) die(json_encode(array('error' => 'Error: Invalid file name')));
 
-	// From the bottom of the $contentDir, look for format templates,
-	// working upwards until we get to CONTENT_DIR
-	$template = null;
-	$workDir = $contentDir;
-	while(strlen($workDir) >= strlen(CONTENT_DIR)) {
-	  // See if there's a format template here...?
-	  if(file_exists($workDir . 'format.templ')) {
-	    $template = strip_tags(substr($workDir . 'format.templ', strlen(CONTENT_DIR)));
-	    break;
-	  }
-	  // Now strip off the last bit of path from the $workDir
-	  $workDir = preg_replace('/[^\/]*\/$/', '', $workDir);
-	}
+  // From the bottom of the $contentDir, look for format templates,
+  // working upwards until we get to CONTENT_DIR
+  $template = null;
+  $workDir = $contentDir;
+  while(strlen($workDir) >= strlen(CONTENT_DIR)) {
+    // See if there's a format template here...?
+    if(file_exists($workDir . 'format.templ')) {
+      $template = strip_tags(substr($workDir . 'format.templ', strlen(CONTENT_DIR)));
+      break;
+    }
+    // Now strip off the last bit of path from the $workDir
+    $workDir = preg_replace('/[^\/]*\/$/', '', $workDir);
+  }
 
         $error = '';
         $file .= CONTENT_EXT;
 
-	$content = null;
-	if(!is_null($template)) {
-	  $loader = new Twig_Loader_Filesystem(CONTENT_DIR);
+  $content = null;
+  if(!is_null($template)) {
+    $loader = new Twig_Loader_Filesystem(CONTENT_DIR);
           $twig = new Twig_Environment($loader, array('cache' => null));
           $twig->addExtension(new Twig_Extension_Debug());
           $twig_vars = array(
             'title' => $title,
             'date' => date('j F Y'),
             'time' => date('h:m:s'),
-	    'author' => 'ralph',
+      'author' => 'ralph',
           );
           $content = $twig->render($template, $twig_vars);
-	}
+  }
 
-	if(is_null($content)) {
+  if(is_null($content)) {
           $content = '/*
 Title: '. $title .'
 Author:
 Date: '. date('j F Y') .'
 */
 ';
-	}
+  }
         if(file_exists($contentDir . $file))
         {
             $error = 'Error: A post already exists with this title';
@@ -197,7 +197,7 @@ Date: '. date('j F Y') .'
         }
 
         $file_url = $dir .'/'. str_replace(CONTENT_EXT, '', $file);
-	$file_url = preg_replace('/\/+/', '/', $file_url);
+  $file_url = preg_replace('/\/+/', '/', $file_url);
 
         die(json_encode(array(
             'title' => $title,
@@ -240,15 +240,23 @@ Date: '. date('j F Y') .'
         )));
     }
 
-    private function do_delete()
-    {
-        if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
-        $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
-        $file = self::get_real_filename($file_url);
-        if(!$file) die('Error: Invalid file');
-
-        $file .= CONTENT_EXT;
-        if(file_exists(CONTENT_DIR . $file)) die(unlink(CONTENT_DIR . $file));
+    private function do_delete() {
+      if( !isset( $_SESSION['backend_logged_in'] ) || !$_SESSION['backend_logged_in'] ) die( json_encode( array( 'error' => 'Error: Unathorized' ) ) );
+      $file_url = isset( $_POST['file'] ) && $_POST['file'] ? $_POST['file'] : '';
+      $file = self::get_real_filename( $file_url );
+      if( !$file ) die( 'Error: Invalid file' );
+      $file .= CONTENT_EXT;
+      if(file_exists(CONTENT_DIR . $file)) {
+        $ret = unlink(CONTENT_DIR . $file);
+        // if sub dir and its empty: remove it
+        $dir = dirname( $file );
+        if( $dir && $dir != '/' )
+        {
+          $path = realpath( CONTENT_DIR . $dir );
+          if( count( glob( $path . '/*' ) ) === 0 ) rmdir( $path );
+        }
+        die($ret);
+      }
     }
 
     private function do_filemgr()
