@@ -1,25 +1,16 @@
 Pico Back-end - An admin interface for Pico CMS
 ===============================================
 
-Provides a Git-connected online Markdown editor and file manager for Pico.
+Back-end for Pico CMS.
 
 Install
 -------
 
-Either:
-
-* Clone the Github repo into your 'plugins' directory (so you get a 'cms' subdirectory)
-
-Or:
-
-* Extract the zip into your 'plugins' directory
-
-Then:
-
-1. Open the config.php file and insert your sha1 hashed password
-2. Visit http://www.yoursite.com/cms and login
-3. Update the permissions if needed.
-4. Thats it :)
+1. Clone the Github repo or download the latest release and extract the zip
+2. Copy the 'cms' directory in your Pico 'plugins' directory (the path will be 'plugins/cms')
+3. Open the config.php file and insert your sha1 hashed password
+4. Visit http://www.yoursite.com/cms and login
+5. Update the permissions if needed
 
 About
 -----
