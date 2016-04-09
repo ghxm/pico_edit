@@ -8,7 +8,7 @@
  * @version 0.2
  */
 
-class Backend {
+class Pico_Edit {
 
 	private $is_admin;
 	private $is_logout;

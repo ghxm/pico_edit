@@ -5,8 +5,8 @@ html, body, iframe, div {
 
 #epiceditor-utilbar {
   position:fixed;
-  bottom:10px;
-  right:10px;
+  top:10px;
+  right:25px;
 }
 
 #epiceditor-utilbar button {
