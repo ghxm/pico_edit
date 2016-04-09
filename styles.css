@@ -234,7 +234,7 @@ a:hover, a:active {
 	right: 0;
 	z-index: 50;
 	font-family: 'icomoon';
-	width: 15px;
+	width: 25px;
 	height: 25px;
 	padding: 0;
 	border: 0;
@@ -242,8 +242,8 @@ a:hover, a:active {
 	margin: 0;
 	opacity: 0;
 }
-#sidebar li .view { right: 30px; }
-#sidebar li .delete { padding-right: 15px; }
+#sidebar li .view { right: 25px; }
+#sidebar li .delete { padding-right: 5px; }
 #sidebar li:hover .view,
 #sidebar li:hover .delete { opacity: 1; }
 

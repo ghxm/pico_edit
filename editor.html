@@ -25,8 +25,8 @@
     <ul class="nav">
     {% for page in pages %}
       <li><a href="#" data-url="{{ page.url }}" class="post"><span data-icon="file-text2" aria-hidden="true"></span>{{ page.url|slice(base_url|length,1000) }}</a>
-      <a href="{{ page.url }}" target="_blank" class="view" title="View"><span data-icon="eye" aria-hidden="true"></span></a>
-      <a href="#" data-url="{{ page.url }}" class="delete" title="Delete"><span data-icon="eye-blocked" aria-hidden="true"></span></a></li>
+      <a href="{{ page.url }}" target="_blank" class="view" title="View"><span class="icon" data-icon="eye" aria-hidden="true"></span></a>
+      <a href="#" data-url="{{ page.url }}" class="delete" title="Delete"><span class="icon" data-icon="bin" aria-hidden="true"></span></a></li>
     {% endfor %}
     </ul>
   </div>
@@ -98,7 +98,7 @@
               editor.importFile('epiceditor', data.content);
               unsaved = false;
               document.title = document.title.replace(' *', '');
-              $('.nav').prepend('<li><a href="#" data-url="{{ base_url }}/'+ data.file +'" class="post open"><span data-icon="&#x926;" aria-hidden="true"></span>'+ data.file +'</a><a href="{{ base_url }}/'+ data.file +'" target="_blank" class="view" title="View">5</a><a href="#" data-url="{{ base_url }}/'+ data.file +'" class="delete" title="Delete">4</a></li>')
+              $('.nav').prepend('<li><a href="#" data-url="{{ base_url }}/'+ data.file +'" class="post open"><span data-icon="file-text2" aria-hidden="true"></span>'+ data.file +'</a><a href="{{ base_url }}/'+ data.file +'" target="_blank" class="view" title="View"><span class="icon" data-icon="eye" aria-hidden="true"></span></a><a href="#" data-url="{{ base_url }}/'+ data.file +'" class="delete" title="Delete"><span class="icon" data-icon="bin" aria-hidden="true"></span></a></li>')
             }
           }, 'json');
         }
