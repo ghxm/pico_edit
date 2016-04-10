@@ -20,21 +20,21 @@
       <a href="#" class="new btn icon-plus marg-r5" title="New"></a>
       <a href="#" class="pushpullbutton btn icon-download2 marg-r5" title="Git Push/Pull"></a>
       <a href="#" class="commitbutton btn icon-upload2 marg-r5" title="Git Commit"></a>
-      <a href="{{ base_url }}/pico_edit/logout" class="logout btn icon-switch" title="Logout"></a>
+      <a href="{{ pico_edit_url }}/logout" class="logout btn icon-switch" title="Logout"></a>
     </div>
     <ul class="nav0">
       {% if config.pico_edit_options %}
       <li><a href="#" data-url="conf" class="post page-options"><span class="icon-equalizer2 marg-r5" aria-hidden="true"></span><i>config options</i></a></li>
       {% endif %}
       {% if config.pico_edit_404 %}
-      <li><a href="#" data-url="{{ base_url }}/404" class="post page-404"><span class="icon-file-empty marg-r5" aria-hidden="true"></span><i>404</i></a></li>
+      <li><a href="#" data-url="/404" class="post page-404"><span class="icon-file-empty marg-r5" aria-hidden="true"></span><i>404</i></a></li>
       {% endif %}
     </ul>
     <ul class="nav">
     {% for page in pages %}
-      <li><a href="#" data-url="{{ page.url }}" class="post"><span class="icon-file-text2 marg-r5" aria-hidden="true"></span>{{ page.url|slice(base_url|length,1000) }}</a>
+      <li><a href="#" data-url="{{ page.id }}" class="post"><span class="icon-file-text2 marg-r5" aria-hidden="true"></span>/{{ page.id }}</a>
       <a href="{{ page.url }}" target="_blank" class="view" title="View"><span class="icon icon-eye" aria-hidden="true"></span></a>
-      <a href="#" data-url="{{ page.url }}" class="delete" title="Delete"><span class="icon icon-bin" aria-hidden="true"></span></a></li>
+      <a href="#" data-url="{{ page.id }}" class="delete" title="Delete"><span class="icon icon-bin" aria-hidden="true"></span></a></li>
     {% endfor %}
     </ul>
   </div>
@@ -47,7 +47,7 @@
     <script src="{{ base_url }}/plugins/pico_edit/libs/epiceditor/js/epiceditor.min.js"></script>
     <script>
     $(document).ready(function() {
-      //$.getJSON("pico_edit/files", function(data) {
+      //$.getJSON("{{ pico_edit_url }}/files", function(data) {
       //  for(i=0; i < data.len; i++) {
       //    $('.nav').append('<li>filemgr ' + data[i].entry + '</li>')
       //  };
@@ -77,8 +77,8 @@
         focusOnLoad: true
       }).load();
 
-      $.post('pico_edit/open', { file: "/" }, function(data){
-        $('#epiceditor').data('currentFile', "/");
+      $.post( '{{ pico_edit_url }}/open', { file: "index" }, function(data){
+        $('#epiceditor').data('currentFile', "index");
         editor.importFile('epiceditor', data);
         unsaved = false;
         document.title = document.title.replace(' *', '');
@@ -94,19 +94,19 @@
       // New
       $('.controls .new').on('click', function(e){
         e.preventDefault();
-        var dir = prompt('Please enter the dir(path without host and page/file name)', '/');
-        var title = prompt('Please enter a post title', '');
-        if(title != null && title != '' && dir != null && dir != ''){
-          $.post('pico_edit/new', { title: title, dir: dir }, function(data){
-            if(data.error){
-              alert(data.error);
-            } else {
+        var title = prompt('Enter page title; optionally with path, example: sub folder/my page', '');
+        if(title != null && title != '' ){
+          $.post( '{{ pico_edit_url }}/new', { title: title }, function(data){
+            if( data.error ) {
+              alert( data.error );
+            }
+            else {
               $('.nav .post').removeClass('open');
-              $('#epiceditor').data('currentFile', "{{ base_url }}" + data.file);
+              $('#epiceditor').data('currentFile', data.file );
               editor.importFile('epiceditor', data.content);
               unsaved = false;
               document.title = document.title.replace(' *', '');
-              $('.nav').prepend('<li><a href="#" data-url="{{ base_url }}/'+ data.file +'" class="post open"><span class="icon-file-text2 marg-r5" aria-hidden="true"></span>'+ data.file +'</a><a href="{{ base_url }}/'+ data.file +'" target="_blank" class="view" title="View"><span class="icon icon-eye marg-r5" aria-hidden="true"></span></a><a href="#" data-url="{{ base_url }}/'+ data.file +'" class="delete" title="Delete"><span class="icon icon-bin marg-r5" aria-hidden="true"></span></a></li>')
+              $('.nav').prepend('<li><a href="#" data-url="'+ data.file +'" class="post open"><span class="icon-file-text2 marg-r5" aria-hidden="true"></span>/'+ data.file +'</a><a href="'+ data.url +'" target="_blank" class="view" title="View"><span class="icon icon-eye marg-r5" aria-hidden="true"></span></a><a href="#" data-url="'+ data.file +'" class="delete" title="Delete"><span class="icon icon-bin marg-r5" aria-hidden="true"></span></a></li>')
             }
           }, 'json');
         }
@@ -120,7 +120,7 @@
         $(this).addClass('open');
 
         var fileUrl = $(this).attr('data-url');
-        $.post('pico_edit/open', { file: fileUrl }, function(data){
+        $.post( '{{ pico_edit_url }}/open', { file: fileUrl }, function(data){
           $('#epiceditor').data('currentFile', fileUrl);
           editor.importFile('epiceditor', data);
           unsaved = false;
@@ -131,7 +131,7 @@
       // Save post
       editor.on('autosave', function () {
         $('#saving').text('Saving...').addClass('active');
-        $.post('pico_edit/save', { file: $('#epiceditor').data('currentFile'), content: editor.exportFile() }, function(data){
+        $.post('{{ pico_edit_url }}/save', { file: $('#epiceditor').data('currentFile'), content: editor.exportFile() }, function(data){
           $('#saving').text('Saved');
           unsaved = false;
           document.title = document.title.replace(' *', '');
@@ -154,7 +154,7 @@
 
         var li = $(this).parents('li');
         var fileUrl = $(this).attr('data-url');
-        $.post('pico_edit/delete', { file: fileUrl }, function(data){
+        $.post('{{ pico_edit_url }}/delete', { file: fileUrl }, function(data){
           li.remove();
           $('#epiceditor').data('currentFile', '');
           editor.importFile('epiceditor', '');
@@ -165,7 +165,7 @@
 
       $('.controls').on('click', '.savebutton', function(e) {
         $('#saving').text('Saving...').addClass('active');
-        $.post('pico_edit/save', { file: $('#epiceditor').data('currentFile'), content: editor.exportFile() }, function(data){
+        $.post('{{ pico_edit_url }}/save', { file: $('#epiceditor').data('currentFile'), content: editor.exportFile() }, function(data){
           $('#saving').text('Saved');
           unsaved = false;
           document.title = document.title.replace(' *', '');
@@ -176,11 +176,11 @@
       });
       $('.controls').on('click', '.commitbutton', function(e) {
         open_popup();
-        $('.popupcontent').load('pico_edit/commit');
+        $('.popupcontent').load('{{ pico_edit_url }}/commit');
       });
       $('.controls').on('click', '.pushpullbutton', function(e) {
         open_popup();
-        $('.popupcontent').load('pico_edit/pushpull');
+        $('.popupcontent').load('{{ pico_edit_url }}/pushpull');
       });
       $('#popup').on('click', '.closegadget', function(e) {
         close_popup();
@@ -215,7 +215,7 @@
       $(document).unbind('keyup.popup');
     }
 
-    $.getJSON("pico_edit/git", function(data) {
+    $.getJSON("{{ pico_edit_url }}/git", function(data) {
       if(data.have_repo) {
         $('.commitbutton').show();
       }
