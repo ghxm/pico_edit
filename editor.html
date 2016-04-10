@@ -9,28 +9,28 @@
 <body>
   <div id="cover"></div>
   <div id="popup">
-    <div class="closegadget"><span data-icon="cross" aria-hiddne="true"></span></div>
+    <div class="closegadget"><span class="icon-cross" aria-hiddne="true"></span></div>
     <div class="popupcontent">Loading...</div>
   </div>
   <div id="saving">Saving...</div>
 
   <div id="sidebar">
     <div class="controls">
-      <a href="#" class="pushpullbutton btn" title="Git Push/Pull"></a>
-      <a href="#" class="commitbutton btn" title="Git Commit"></a>
-      <a href="#" class="savebutton btn" title="Save"></a>
-      <a href="#" class="new btn" title="New"></a>
-      <a href="{{ base_url }}/pico_edit/logout" class="logout btn" title="Logout"></a>
+      <a href="#" class="savebutton btn icon-floppy-disk" title="Save"></a>
+      <a href="#" class="new btn icon-plus marg-r5" title="New"></a>
+      <a href="#" class="pushpullbutton btn icon-download2 marg-r5" title="Git Push/Pull"></a>
+      <a href="#" class="commitbutton btn icon-upload2 marg-r5" title="Git Commit"></a>
+      <a href="{{ base_url }}/pico_edit/logout" class="logout btn icon-switch" title="Logout"></a>
     </div>
     <ul class="nav0">
-      <li><a href="#" data-url="conf" class="post page-options"><span data-icon="file4" aria-hidden="true"></span><i>config options</i></a></li>
-      <li><a href="#" data-url="{{ base_url }}/404" class="post page-404"><span data-icon="file4" aria-hidden="true"></span><i>404</i></a></li>
+      <li><a href="#" data-url="conf" class="post page-options"><span class="icon-equalizer2 marg-r5" aria-hidden="true"></span><i>config options</i></a></li>
+      <li><a href="#" data-url="{{ base_url }}/404" class="post page-404"><span class="icon-file-empty marg-r5" aria-hidden="true"></span><i>404</i></a></li>
     </ul>
     <ul class="nav">
     {% for page in pages %}
-      <li><a href="#" data-url="{{ page.url }}" class="post"><span data-icon="file4" aria-hidden="true"></span>{{ page.url|slice(base_url|length,1000) }}</a>
-      <a href="{{ page.url }}" target="_blank" class="view" title="View"><span class="icon" data-icon="eye" aria-hidden="true"></span></a>
-      <a href="#" data-url="{{ page.url }}" class="delete" title="Delete"><span class="icon" data-icon="bin" aria-hidden="true"></span></a></li>
+      <li><a href="#" data-url="{{ page.url }}" class="post"><span class="icon-file-text2 marg-r5" aria-hidden="true"></span>{{ page.url|slice(base_url|length,1000) }}</a>
+      <a href="{{ page.url }}" target="_blank" class="view" title="View"><span class="icon icon-eye" aria-hidden="true"></span></a>
+      <a href="#" data-url="{{ page.url }}" class="delete" title="Delete"><span class="icon icon-bin" aria-hidden="true"></span></a></li>
     {% endfor %}
     </ul>
   </div>
@@ -102,7 +102,7 @@
               editor.importFile('epiceditor', data.content);
               unsaved = false;
               document.title = document.title.replace(' *', '');
-              $('.nav').prepend('<li><a href="#" data-url="{{ base_url }}/'+ data.file +'" class="post open"><span data-icon="file-text2" aria-hidden="true"></span>'+ data.file +'</a><a href="{{ base_url }}/'+ data.file +'" target="_blank" class="view" title="View"><span class="icon" data-icon="eye" aria-hidden="true"></span></a><a href="#" data-url="{{ base_url }}/'+ data.file +'" class="delete" title="Delete"><span class="icon" data-icon="bin" aria-hidden="true"></span></a></li>')
+              $('.nav').prepend('<li><a href="#" data-url="{{ base_url }}/'+ data.file +'" class="post open"><span class="icon-file-text2 marg-r5" aria-hidden="true"></span>'+ data.file +'</a><a href="{{ base_url }}/'+ data.file +'" target="_blank" class="view" title="View"><span class="icon icon-eye marg-r5" aria-hidden="true"></span></a><a href="#" data-url="{{ base_url }}/'+ data.file +'" class="delete" title="Delete"><span class="icon icon-bin marg-r5" aria-hidden="true"></span></a></li>')
             }
           }, 'json');
         }

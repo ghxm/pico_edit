@@ -31,9 +31,26 @@ final class Pico_Edit extends AbstractPicoPlugin {
         if( $pos > 0 )
         {
           $key = trim( substr( $line, 0, $pos ) );
-          $value = trim( substr( $line, $pos + 1 ) );
-          // if( isset( $config[$key] ) )
-          $config[$key] = $value;
+          if( $key && $key[0] != '#' )
+          {
+            $value = trim( substr( $line, $pos + 1 ) );
+            // if( isset( $config[$key] ) )
+            $config[$key] = $value;
+          }
+        }
+        else
+        {
+          $pos = strpos( $line_, '!' );
+          if( $pos > 0 )
+          {
+            $key = trim( substr( $line, 0, $pos ) );
+            if( $key && $key[0] != '#' )
+            {
+              $value = trim( substr( $line, $pos + 1 ) );
+              // if( isset( $config[$key] ) )
+              $config[$key] = ( $value == '1' || $value == 'true' || $value == 'TRUE' || $value == 'yes' || $value == 'YES' || $value == 'on' || $value == 'ON' );
+            }
+          }
         }
       }
     }

@@ -2,13 +2,12 @@
 <html lang="en" class="no-js">
 <head>
   <meta charset="utf-8" />
-  <title>Pico Edit Login</title>
+  <title>Login</title>
   <link rel="stylesheet" href="{{ base_url }}/plugins/pico_edit/styles.css" type="text/css" />
   <meta name="robots" content="noindex, nofollow" />
 </head>
 <body>
   <form id="login-form" method="post" action="">
-    <h1>Pico Edit Login</h1>
     {% if login_error %}<p class="error">{{ login_error }}</p>{% endif %}
     <label for="password">Password</label><br/>
     <input type="password" name="password" id="password" autofocus/>
