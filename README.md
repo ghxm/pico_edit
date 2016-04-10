@@ -41,7 +41,8 @@ Features:
 Options (Pico "config/config.php"):
 
 	$config['pico_edit_404'] = true;
-	$config['pico_edit_options'] = false;	// Disallow options editing
+	$config['pico_edit_options'] = false;			// Disallow options editing
+	$config['pico_edit_default_author'] = 'Me';		// Default author for new pages
 
 Editing Pico options
 --------------------

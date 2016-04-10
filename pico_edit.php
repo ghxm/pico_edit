@@ -219,14 +219,14 @@ final class Pico_Edit extends AbstractPicoPlugin {
           $content = $twig->render($template, $twig_vars);
   }
 
-  if(is_null($content)) {
+        if( is_null( $content ) ) {
           $content = '/*
 Title: '. $title .'
-Author:
+Author: ' . ( $this->getConfig( 'pico_edit_default_author' ) ? $this->getConfig( 'pico_edit_default_author' ) : '' ) . '
 Date: '. date('j F Y') .'
 */
 ';
-  }
+        }
         if(file_exists($contentDir . $file))
         {
             $error = 'Error: A post already exists with this title';
