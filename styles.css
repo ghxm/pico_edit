@@ -399,6 +399,32 @@ a:hover, a:active {
   display: none;
 }
 
+#popuptable {
+  border-left: 1px solid #c0c0c0;
+  border-top: 1px solid #c0c0c0;
+}
+
+#popuptable td {
+  border-right: 1px solid #c0c0c0;
+  border-bottom: 1px solid #c0c0c0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#popuptable th {
+  font-weight: bold;
+  border-right: 1px solid #c0c0c0;
+  border-bottom: 1px solid #c0c0c0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#pushpullbuttons {
+  padding-top: 10px;
+}
+
+/* --- */
+
 [data-icon]:before {
   content: attr(data-icon);
 }
@@ -415,19 +441,6 @@ a:hover, a:active {
   position: relative;
   top: 1px;
   z-index: 0;
-}
-
-.savebutton:before {
-  content: "\e962";
-}
-.pushpullbutton:before {
-  content: "\e98b";
-}
-.commitbutton:before {
-  content: "\e960";
-}
-.new:before {
-  content: "\ea0a";
 }
 
 .icon-pencil:before {
@@ -494,28 +507,3 @@ a:hover, a:active {
 .marg-r5 {
   margin-right: 5px;
 }
-
-#popuptable {
-  border-left: 1px solid #c0c0c0;
-  border-top: 1px solid #c0c0c0;
-}
-
-#popuptable td {
-  border-right: 1px solid #c0c0c0;
-  border-bottom: 1px solid #c0c0c0;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-#popuptable th {
-  font-weight: bold;
-  border-right: 1px solid #c0c0c0;
-  border-bottom: 1px solid #c0c0c0;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-#pushpullbuttons {
-  padding-top: 10px;
-}
-
