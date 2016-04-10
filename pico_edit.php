@@ -19,6 +19,9 @@ final class Pico_Edit extends AbstractPicoPlugin {
   private $password = '';
 
   public function onConfigLoaded( array &$config ) {
+    // Default options
+    if( !isset( $config['pico_edit_404'] ) ) $config['pico_edit_404'] = TRUE;
+    if( !isset( $config['pico_edit_options'] ) ) $config['pico_edit_options'] = TRUE;
     // Parse extra options
     $conf = $this->getConfigDir() . '/options.conf';
     if( !file_exists( $conf ) ) touch( $conf );
@@ -245,57 +248,55 @@ Date: '. date('j F Y') .'
         )));
     }
 
-    private function do_open()
-    {
-        if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
-        $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
-        if( $file_url != 'conf' )
-        {
-          $file = self::get_real_filename($file_url);
-          if(!$file) die('Error: Invalid file');
+    private function do_open() {
+      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+      $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
+      if( $file_url != 'conf' )
+      {
+        $file = self::get_real_filename($file_url);
+        if(!$file) die('Error: Invalid file');
 
-          $file .= CONTENT_EXT;
-          if(file_exists(CONTENT_DIR . $file)) die(file_get_contents(CONTENT_DIR . $file));
-          else die('Error: Invalid file');
-        }
-        else
-        {
-          $conf = $this->getConfigDir() . '/options.conf';
-          if( file_exists( $conf ) ) die( file_get_contents( $conf ) );
-          else die( 'Error: Invalid file' );
-        }
+        $file .= CONTENT_EXT;
+        if(file_exists(CONTENT_DIR . $file)) die(file_get_contents(CONTENT_DIR . $file));
+        else die('Error: Invalid file');
+      }
+      else if( $this->getConfig( 'pico_edit_options' ) )
+      {
+        $conf = $this->getConfigDir() . '/options.conf';
+        if( file_exists( $conf ) ) die( file_get_contents( $conf ) );
+        else die( 'Error: Invalid file' );
+      }
     }
 
-    private function do_save()
-    {
-        if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
-        $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
-        if( $file_url != 'conf' )
-        {
-          $file = self::get_real_filename($file_url);
-          if(!$file) die('Error: Invalid file');
-          $content = isset($_POST['content']) && $_POST['content'] ? $_POST['content'] : '';
-          if(!$content) die('Error: Invalid content');
+    private function do_save() {
+      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+      $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
+      if( $file_url != 'conf' )
+      {
+        $file = self::get_real_filename($file_url);
+        if(!$file) die('Error: Invalid file');
+        $content = isset($_POST['content']) && $_POST['content'] ? $_POST['content'] : '';
+        if(!$content) die('Error: Invalid content');
 
-          $file .= CONTENT_EXT;
-          $error = '';
-          if(strlen($content) !== file_put_contents(CONTENT_DIR . $file, $content))
-              $error = 'Error: can not save changes ... ';
+        $file .= CONTENT_EXT;
+        $error = '';
+        if(strlen($content) !== file_put_contents(CONTENT_DIR . $file, $content))
+            $error = 'Error: can not save changes ... ';
 
-          die(json_encode(array(
-              'content' => $content,
-              'file' => $file_url,
-              'error' => $error
-          )));
-        }
-        else
-        {
-          $conf = $this->getConfigDir() . '/options.conf';
-          $content = ( isset( $_POST['content'] ) && $_POST['content'] ) ? filter_var( $_POST['content'], FILTER_SANITIZE_STRING ) : '';
-          $error = '';
-          if( strlen( $content ) !== file_put_contents( $conf, $content ) ) $error = 'Error: can not save changes ... ';
-          die( json_encode( array( 'content' => $content, 'file' => $conf, 'error' => $error ) ) );
-        }
+        die(json_encode(array(
+            'content' => $content,
+            'file' => $file_url,
+            'error' => $error
+        )));
+      }
+      else if( $this->getConfig( 'pico_edit_options' ) )
+      {
+        $conf = $this->getConfigDir() . '/options.conf';
+        $content = ( isset( $_POST['content'] ) && $_POST['content'] ) ? filter_var( $_POST['content'], FILTER_SANITIZE_STRING ) : '';
+        $error = '';
+        if( strlen( $content ) !== file_put_contents( $conf, $content ) ) $error = 'Error: can not save changes ... ';
+        die( json_encode( array( 'content' => $content, 'file' => $conf, 'error' => $error ) ) );
+      }
     }
 
     private function do_delete() {

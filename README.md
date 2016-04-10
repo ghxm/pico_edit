@@ -30,11 +30,18 @@ Features:
 
 * Simple and clean interface
 
-* MarkDown preview (with top right icon in the editor)
+* Page create/edit/delete
+
+* Markdown preview (top right icon in the editor)
 
 * Edit 404 page (aka "page not found")
 
 * Edit Pico options
+
+Options (Pico "config/config.php"):
+
+	$config['pico_edit_404'] = true;
+	$config['pico_edit_options'] = false;	// Disallow options editing
 
 Editing Pico options
 --------------------
