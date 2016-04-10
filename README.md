@@ -6,20 +6,11 @@ A small Back-end for Pico CMS.
 Install
 -------
 
-Either:
+1. Clone the Github repo into your 'plugins' directory (so you get a 'pico_edit' subdirectory) OR extract the zip into your 'plugins' directory (and rename the new directory to 'pico_edit')
+2. Open the Pico config.php file and insert your sha1 hashed password
+3. Visit http://www.yoursite.com/pico_edit and login
 
-* Clone the Github repo into your 'plugins' directory (so you get a 'pico_edit' subdirectory)
-
-Or:
-
-* Extract the zip into your 'plugins' directory
-
-Then:
-
-1. Open the config.php file and insert your sha1 hashed password
-2. Visit http://www.yoursite.com/pico_edit and login
-3. Update the permissions if needed.
-4. Thats it :)
+If pages editing doesn't work check file/dir permissions of 'content' folder.
 
 About
 -----
