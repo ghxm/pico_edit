@@ -23,11 +23,12 @@
       <a href="{{ base_url }}/pico_edit/logout" class="logout btn" title="Logout"></a>
     </div>
     <ul class="nav0">
-      <li><a href="#" data-url="{{ base_url }}/404" class="post"><span data-icon="file-text2" aria-hidden="true"></span>404</a></li>
+      <li><a href="#" data-url="conf" class="post page-options"><span data-icon="file4" aria-hidden="true"></span><i>config options</i></a></li>
+      <li><a href="#" data-url="{{ base_url }}/404" class="post page-404"><span data-icon="file4" aria-hidden="true"></span><i>404</i></a></li>
     </ul>
     <ul class="nav">
     {% for page in pages %}
-      <li><a href="#" data-url="{{ page.url }}" class="post"><span data-icon="file-text2" aria-hidden="true"></span>{{ page.url|slice(base_url|length,1000) }}</a>
+      <li><a href="#" data-url="{{ page.url }}" class="post"><span data-icon="file4" aria-hidden="true"></span>{{ page.url|slice(base_url|length,1000) }}</a>
       <a href="{{ page.url }}" target="_blank" class="view" title="View"><span class="icon" data-icon="eye" aria-hidden="true"></span></a>
       <a href="#" data-url="{{ page.url }}" class="delete" title="Delete"><span class="icon" data-icon="bin" aria-hidden="true"></span></a></li>
     {% endfor %}

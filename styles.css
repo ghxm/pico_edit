@@ -206,13 +206,16 @@ a:hover, a:active {
 	margin: 38px 0 0 0;
 	padding: 0;
 }
-#sidebar .nav0 a {
-	font-style: italic;
-}
 #sidebar .nav {
 	list-style: none;
 	margin: 0 0 25px 0;
 	padding: 0;
+}
+#sidebar .page-404 span {
+	color: #c00;
+}
+#sidebar .page-options span {
+	color: #060;
 }
 #sidebar li { 
 	line-height: 25px;

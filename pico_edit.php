@@ -19,6 +19,25 @@ final class Pico_Edit extends AbstractPicoPlugin {
   private $password = '';
 
   public function onConfigLoaded( array &$config ) {
+    // Parse extra options
+    $conf = $this->getConfigDir() . '/options.conf';
+    if( !file_exists( $conf ) ) touch( $conf );
+    $data = filter_var( file_get_contents( $conf ), FILTER_SANITIZE_STRING );
+    foreach( preg_split( "/((\r?\n)|(\r\n?))/", $data ) as $line ) {
+      $line_ = trim( $line );
+      if( !empty( $line_ ) )
+      {
+        $pos = strpos( $line_, '=' );
+        if( $pos > 0 )
+        {
+          $key = trim( substr( $line, 0, $pos ) );
+          $value = trim( substr( $line, $pos + 1 ) );
+          // if( isset( $config[$key] ) )
+          $config[$key] = $value;
+        }
+      }
+    }
+
     $this->plugin_path = dirname( __FILE__ );
     if( file_exists( $this->plugin_path .'/config.php' ) ) {
       global $backend_password;
@@ -213,33 +232,53 @@ Date: '. date('j F Y') .'
     {
         if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
         $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
-        $file = self::get_real_filename($file_url);
-        if(!$file) die('Error: Invalid file');
+        if( $file_url != 'conf' )
+        {
+          $file = self::get_real_filename($file_url);
+          if(!$file) die('Error: Invalid file');
 
-        $file .= CONTENT_EXT;
-        if(file_exists(CONTENT_DIR . $file)) die(file_get_contents(CONTENT_DIR . $file));
-        else die('Error: Invalid file');
+          $file .= CONTENT_EXT;
+          if(file_exists(CONTENT_DIR . $file)) die(file_get_contents(CONTENT_DIR . $file));
+          else die('Error: Invalid file');
+        }
+        else
+        {
+          $conf = $this->getConfigDir() . '/options.conf';
+          if( file_exists( $conf ) ) die( file_get_contents( $conf ) );
+          else die( 'Error: Invalid file' );
+        }
     }
 
     private function do_save()
     {
         if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
         $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
-        $file = self::get_real_filename($file_url);
-        if(!$file) die('Error: Invalid file');
-        $content = isset($_POST['content']) && $_POST['content'] ? $_POST['content'] : '';
-        if(!$content) die('Error: Invalid content');
+        if( $file_url != 'conf' )
+        {
+          $file = self::get_real_filename($file_url);
+          if(!$file) die('Error: Invalid file');
+          $content = isset($_POST['content']) && $_POST['content'] ? $_POST['content'] : '';
+          if(!$content) die('Error: Invalid content');
 
-        $file .= CONTENT_EXT;
-        $error = '';
-        if(strlen($content) !== file_put_contents(CONTENT_DIR . $file, $content))
-            $error = 'Error: can not save changes ... ';
+          $file .= CONTENT_EXT;
+          $error = '';
+          if(strlen($content) !== file_put_contents(CONTENT_DIR . $file, $content))
+              $error = 'Error: can not save changes ... ';
 
-        die(json_encode(array(
-            'content' => $content,
-            'file' => $file_url,
-            'error' => $error
-        )));
+          die(json_encode(array(
+              'content' => $content,
+              'file' => $file_url,
+              'error' => $error
+          )));
+        }
+        else
+        {
+          $conf = $this->getConfigDir() . '/options.conf';
+          $content = ( isset( $_POST['content'] ) && $_POST['content'] ) ? filter_var( $_POST['content'], FILTER_SANITIZE_STRING ) : '';
+          $error = '';
+          if( strlen( $content ) !== file_put_contents( $conf, $content ) ) $error = 'Error: can not save changes ... ';
+          die( json_encode( array( 'content' => $content, 'file' => $conf, 'error' => $error ) ) );
+        }
     }
 
     private function do_delete() {
