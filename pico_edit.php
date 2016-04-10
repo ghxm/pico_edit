@@ -141,26 +141,19 @@ final class Pico_Edit extends AbstractPicoPlugin {
    * @param string $file_url the file URL to be edited
    * @return string
    */
-  private static function get_real_filename($file_url)
+  private function get_real_filename( $file_url ) {
+    $file_components = parse_url( $file_url ); // inner
+    // $base_components = parse_url($_SESSION['backend_config']['base_url']);
+    $base_components = parse_url( $this->getConfig( 'base_url' ) );
+    $file_path = rtrim( $file_components['path'], '/' );
+    $base_path = rtrim( $base_components['path'], '/' );
+    if( empty( $file_path ) || $file_path === $base_path ) return 'index';
+    else
     {
-
-    $file_components = parse_url($file_url); // inner
-    $base_components = parse_url($_SESSION['backend_config']['base_url']);
-    $file_path = rtrim($file_components['path'], '/');
-    $base_path = rtrim($base_components['path'], '/');
-
-    if(empty($file_path) || $file_path === $base_path)
-        {
-            return 'index';
+      $file_path = strip_tags(substr($file_path, strlen($base_path)));
+      if( is_dir( $this->getConfig('content_dir') . $file_path ) ) $file_path .= "/index";
+      return $file_path;
     }
-        else
-        {
-            $file_path = strip_tags(substr($file_path, strlen($base_path)));
-            if(is_dir(CONTENT_DIR . $file_path))
-                $file_path .= "/index";
-
-            return $file_path;
-        }
   }
 
 
@@ -253,7 +246,7 @@ Date: '. date('j F Y') .'
       $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
       if( $file_url != 'conf' )
       {
-        $file = self::get_real_filename($file_url);
+        $file = $this->get_real_filename($file_url);
         if(!$file) die('Error: Invalid file');
 
         $file .= CONTENT_EXT;
@@ -273,7 +266,7 @@ Date: '. date('j F Y') .'
       $file_url = isset($_POST['file']) && $_POST['file'] ? $_POST['file'] : '';
       if( $file_url != 'conf' )
       {
-        $file = self::get_real_filename($file_url);
+        $file = $this->get_real_filename($file_url);
         if(!$file) die('Error: Invalid file');
         $content = isset($_POST['content']) && $_POST['content'] ? $_POST['content'] : '';
         if(!$content) die('Error: Invalid content');
@@ -302,7 +295,7 @@ Date: '. date('j F Y') .'
     private function do_delete() {
       if( !isset( $_SESSION['backend_logged_in'] ) || !$_SESSION['backend_logged_in'] ) die( json_encode( array( 'error' => 'Error: Unathorized' ) ) );
       $file_url = isset( $_POST['file'] ) && $_POST['file'] ? $_POST['file'] : '';
-      $file = self::get_real_filename( $file_url );
+      $file = $this->get_real_filename( $file_url );
       if( !$file ) die( 'Error: Invalid file' );
       $file .= CONTENT_EXT;
       if(file_exists(CONTENT_DIR . $file)) {
