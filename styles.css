@@ -202,8 +202,9 @@ a:hover, a:active {
   margin-top: 5px;
 }
 #sidebar .nav0 {
+  background: #f4f5f6;
   list-style: none;
-  margin: 38px 0 0 0;
+  margin: 37px 0 0 0;
   padding: 0;
 }
 #sidebar .nav {
@@ -220,7 +221,7 @@ a:hover, a:active {
 #sidebar li { 
   line-height: 25px;
   position: relative; 
-  border-bottom: 1px solid #DCE0E3;
+  border-bottom: 1px dotted #DCE0E3;
 }
 #sidebar li a {
   display: block;
