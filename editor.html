@@ -47,12 +47,6 @@
     <script src="{{ base_url }}/plugins/pico_edit/libs/epiceditor/js/epiceditor.min.js"></script>
     <script>
     $(document).ready(function() {
-      //$.getJSON("{{ pico_edit_url }}/files", function(data) {
-      //  for(i=0; i < data.len; i++) {
-      //    $('.nav').append('<li>filemgr ' + data[i].entry + '</li>')
-      //  };
-      //});
-
       var unsaved = false;
       var editor = new EpicEditor({
         container: 'epiceditor',

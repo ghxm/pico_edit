@@ -9,9 +9,13 @@
 <body>
   <form id="login-form" method="post" action="">
     {% if login_error %}<p class="error">{{ login_error }}</p>{% endif %}
-    <label for="password">Password</label><br/>
-    <input type="password" name="password" id="password" autofocus/>
-    <input type="submit" value="Login" class="btn"/>
+    <div>
+      <label for="password">Password:</label>
+    </div>
+    <div>
+      <input type="password" name="password" id="password" autofocus/>
+      <input type="submit" value="Login" class="btn"/>
+    </div>
   </form>
 </body>
 </html>

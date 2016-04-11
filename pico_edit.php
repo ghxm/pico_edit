@@ -135,7 +135,6 @@ final class Pico_Edit extends AbstractPicoPlugin {
     if( $url == 'pico_edit/save' ) $this->do_save();
     if( $url == 'pico_edit/delete' ) $this->do_delete();
     if( $url == 'pico_edit/logout' ) $this->is_logout = true;
-    if( $url == 'pico_edit/files' ) $this->do_filemgr();
     if( $url == 'pico_edit/commit' ) $this->do_commit();
     if( $url == 'pico_edit/git' ) $this->do_git();
     if( $url == 'pico_edit/pushpull' ) $this->do_pushpull();
@@ -298,273 +297,246 @@ final class Pico_Edit extends AbstractPicoPlugin {
     }
   }
 
-    private function do_filemgr()
-    {
-      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
-      $dir = isset($_POST['dir']) && $_POST['dir'] ? strip_tags($_POST['dir']) : '';
-      if(substr($dir,0,1) != '/') {
-        $dir = "/$dir";
-      }
-      $dir = preg_replace('/\/+/', '/', $dir);
-
-      $contentDir = CONTENT_DIR . $dir;
-      if($contentDir[strlen(count($contentDir)-1)] != '/') {
-        $contentDir .= '/';
-      }
-      error_log("do_filemgr() dir=$dir contentDir=$contentDir");
-
-      // Now stat files/directories inside here, and return an array
-      // of file information. This duplicates what Pico does in its
-      // page building
-
-      die(json_encode(array(
-        array('entry' => '/subdir', 'type' => 'dir', 'editable' => 0),
-        array('entry' => '/one.md', 'type' => 'file', 'editable' => 1),
-        array('entry' => '/two.md', 'type' => 'file', 'editable' => 1),
-        array('entry' => '/four.md', 'type' => 'file', 'editable' => 1),
-        array('entry' => '/five.png', 'type' => 'file', 'editable' => 0),
-      )));
+  private function do_commit()
+  {
+    if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+    if($_SERVER['REQUEST_METHOD'] == 'POST') {
+      return $this->do_commit_post();
     }
+    return $this->do_commit_get();
+  }
 
-    private function do_commit()
-    {
-      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
-      if($_SERVER['REQUEST_METHOD'] == 'POST') {
-        return $this->do_commit_post();
-      }
-      return $this->do_commit_get();
-    }
-
-    private function do_commit_get()
-    {
-      if(file_exists('./plugins/pico_edit/commitform.html')) {
-        # Do the git stuff...
-        require_once 'Git-php-lib';
-        $repo = Git::open('.');
-        $status = '';
-        try {
-          $status = $repo->porcelain();
-        }
-        catch(Exception $e) {
-          $status = array('Failed to run git-status: ' . $e->getMessage());
-        }
-
-        $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
-        $twig = new Twig_Environment($loader, array('cache' => null));
-        $twig->addExtension(new Twig_Extension_Debug());
-        $twig_vars = array(
-          'status' => $status,
-        );
-        $content = $twig->render('commitform.html', $twig_vars);
-        die($content);
-      } else {
-        die('Sorry, commitform.html was not found in the backend plugin. This is an installation problem.');
-      }
-    }
-
-    private function do_commit_post()
-    {
-      // $_REQUEST['file'] is an array of file names. We don't trust our client,
-      // so will re-run 'porcelain' to get a list of files. We'll only 'git add'
-      // any files supplied by the user that are in the list we get from porcelain
-      // we'll then go ahead and commit them with the message supplied
+  private function do_commit_get()
+  {
+    if(file_exists('./plugins/pico_edit/commitform.html')) {
+      # Do the git stuff...
       require_once 'Git-php-lib';
       $repo = Git::open('.');
-      $status = $repo->porcelain();
-      $git_files = array();
-      foreach($status as $item) {
-        $git_files[$item['file']] = $item['y'];
-      }
-
-      $to_add = array();
-      $to_rm = array();
-      foreach($_REQUEST['file'] as $requested_file) {
-        if(array_key_exists($requested_file, $git_files)) {
-          if($git_files[$requested_file] == 'D') {
-            $to_rm[] = $requested_file;
-          } else {
-            $to_add[] = $requested_file;
-          }
-        }
-      }
-
-      $add_output = '';
-      if(count($to_add) > 0) {
-        try {
-          $add_output = $repo->add($to_add);
-        }
-        catch(Exception $e) {
-          $add_output = 'Failed to run git-add: ' . $e->getMessage();
-        }
-      }
-      #$add_output = preg_replace('/\r?\n\r?/', "<br>\n", $add_output);
-      if(count($to_rm) > 0) {
-        $rm_output = '';
-        try {
-          $rm_output = $repo->rm($to_rm);
-        }
-        catch(Exception $e) {
-          $rm_output = 'Failed to run git-rm: ' . $e->getMessage();
-        }
-      }
-
-      $commit_output = '';
+      $status = '';
       try {
-        $commit_output = $repo->commit($_REQUEST['message'], false);
+        $status = $repo->porcelain();
       }
       catch(Exception $e) {
-        $commit_output = 'Failed to run git-commit: ' . $e->getMessage();
+        $status = array('Failed to run git-status: ' . $e->getMessage());
       }
-      #$commit_output = preg_replace('/\r?\n\r?/', "<br>\n", $add_output);
 
-      if(file_exists('./plugins/pico_edit/commitresponse.html')) {
-        $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
-        $twig = new Twig_Environment($loader, array('cache' => null));
-        $twig->addExtension(new Twig_Extension_Debug());
-        $twig_vars = array(
-          'add' => $add_output,
-          'rm' => $rm_output,
-          'commit' => $commit_output,
-        );
-        $content = $twig->render('commitresponse.html', $twig_vars);
-        die($content);
-      } else {
-        die('Sorry, commitresponse.html was not found in the backend plugin. This is an installation problem.');
-      }
-    }
-
-    private function do_pushpull()
-    {
-      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
-      if($_SERVER['REQUEST_METHOD'] == 'POST') {
-        return $this->do_pushpull_post();
-      }
-      return $this->do_pushpull_get();
-    }
-
-    private function do_pushpull_get()
-    {
-      if(file_exists('./plugins/pico_edit/pushpullform.html')) {
-        # Do the git stuff...
-        require_once 'Git-php-lib';
-        $repo = Git::open('.');
-        $remotes = '';
-        try {
-          $remotes_string = $repo->run('remote');
-          $remotes = preg_split('/\s*\r?\n\r?\s*/', $remotes_string, 0, PREG_SPLIT_NO_EMPTY);
-        }
-        catch(Exception $e) {
-          $remotes = array('Failed to get git sources: ' . $e->getMessage());
-        }
-
-        $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
-        $twig = new Twig_Environment($loader, array('cache' => null));
-        $twig->addExtension(new Twig_Extension_Debug());
-        $twig_vars = array(
-          'remotes' => $remotes,
-        );
-        $content = $twig->render('pushpullform.html', $twig_vars);
-        die($content);
-      } else {
-        die('Sorry, pushpullform.html was not found in the backend plugin. This is an installation problem.');
-      }
-    }
-
-    private function do_pushpull_post()
-    {
-      if(file_exists('./plugins/pico_edit/pushpullresponse.html')) {
-        # Do the git stuff...
-        require_once 'Git-php-lib';
-        $repo = Git::open('.');
-        $remotes = array();
-        try {
-          $remotes_string = $repo->run('remote');
-          $remotes = preg_split('/\s*\r?\n\r?\s*/', $remotes_string, 0, PREG_SPLIT_NO_EMPTY);
-        }
-        catch(Exception $e) {
-          $status = array('Failed to get git sources: ' . $e->getMessage());
-        }
-
-        $output = 'xyz';
-
-        # Now make the the selected repo is one in the remotes list
-        if(in_array($_REQUEST['remote'], $remotes)) {
-          # Selected repo is acceptable, so go Git push/pull
-
-          try {
-            if($_REQUEST['operation'] == 'push') {
-              $output = $repo->push($_REQUEST['remote'], 'master');
-              error_log("output = $output");
-            } elseif($_REQUEST['operation'] == 'pull') {
-              $output = $repo->pull($_REQUEST['remote'], 'master');
-            } else {
-              $output = 'Sorry, that operation is not allowed';
-            }
-          }
-          catch(Exception $e) {
-            $output = $e->getMessage();
-          }
-        } else {
-          # Not an acceptable remote
-          $output = 'Sorry, that remote is not allowed';
-        }
-
-        # And do output...
-        $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
-        $twig = new Twig_Environment($loader, array('cache' => null));
-        $twig->addExtension(new Twig_Extension_Debug());
-        $twig_vars = array(
-          'output' => $output,
-        );
-        $content = $twig->render('pushpullresponse.html', $twig_vars);
-        die($content);
-      } else {
-        die('Sorry, pushpullresponse.html was not found in the backend plugin. This is an installation problem.');
-      }
-    }
-
-    private function do_git() {
-      if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
-
-      $output = array(
-        'have_git' => 0,
-        'have_repo' => 0,
-        'remotes' => array(),
+      $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
+      $twig = new Twig_Environment($loader, array('cache' => null));
+      $twig->addExtension(new Twig_Extension_Debug());
+      $twig_vars = array(
+        'status' => $status,
       );
+      $content = $twig->render('commitform.html', $twig_vars);
+      die($content);
+    } else {
+      die('Sorry, commitform.html was not found in the backend plugin. This is an installation problem.');
+    }
+  }
 
-      require_once 'Git-php-lib';
-      $output['have_git'] = GitRepo::test_git();
+  private function do_commit_post()
+  {
+    // $_REQUEST['file'] is an array of file names. We don't trust our client,
+    // so will re-run 'porcelain' to get a list of files. We'll only 'git add'
+    // any files supplied by the user that are in the list we get from porcelain
+    // we'll then go ahead and commit them with the message supplied
+    require_once 'Git-php-lib';
+    $repo = Git::open('.');
+    $status = $repo->porcelain();
+    $git_files = array();
+    foreach($status as $item) {
+      $git_files[$item['file']] = $item['y'];
+    }
 
-      if($output['have_git']) {
-        try {
-          $repo = Git::open('.');
-          if(Git::is_repo($repo)) {
-            $output['have_repo'] = true;
-
-            $remotes_string = $repo->run('remote');
-            $output['remotes'] = preg_split('/\s*\r?\n\r?\s*/', $remotes_string, 0, PREG_SPLIT_NO_EMPTY);
-          }
+    $to_add = array();
+    $to_rm = array();
+    foreach($_REQUEST['file'] as $requested_file) {
+      if(array_key_exists($requested_file, $git_files)) {
+        if($git_files[$requested_file] == 'D') {
+          $to_rm[] = $requested_file;
+        } else {
+          $to_add[] = $requested_file;
         }
-        catch(Exception $e) { }
+      }
+    }
+
+    $add_output = '';
+    if(count($to_add) > 0) {
+      try {
+        $add_output = $repo->add($to_add);
+      }
+      catch(Exception $e) {
+        $add_output = 'Failed to run git-add: ' . $e->getMessage();
+      }
+    }
+    #$add_output = preg_replace('/\r?\n\r?/', "<br>\n", $add_output);
+    if(count($to_rm) > 0) {
+      $rm_output = '';
+      try {
+        $rm_output = $repo->rm($to_rm);
+      }
+      catch(Exception $e) {
+        $rm_output = 'Failed to run git-rm: ' . $e->getMessage();
+      }
+    }
+
+    $commit_output = '';
+    try {
+      $commit_output = $repo->commit($_REQUEST['message'], false);
+    }
+    catch(Exception $e) {
+      $commit_output = 'Failed to run git-commit: ' . $e->getMessage();
+    }
+    #$commit_output = preg_replace('/\r?\n\r?/', "<br>\n", $add_output);
+
+    if(file_exists('./plugins/pico_edit/commitresponse.html')) {
+      $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
+      $twig = new Twig_Environment($loader, array('cache' => null));
+      $twig->addExtension(new Twig_Extension_Debug());
+      $twig_vars = array(
+        'add' => $add_output,
+        'rm' => $rm_output,
+        'commit' => $commit_output,
+      );
+      $content = $twig->render('commitresponse.html', $twig_vars);
+      die($content);
+    } else {
+      die('Sorry, commitresponse.html was not found in the backend plugin. This is an installation problem.');
+    }
+  }
+
+  private function do_pushpull()
+  {
+    if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+    if($_SERVER['REQUEST_METHOD'] == 'POST') {
+      return $this->do_pushpull_post();
+    }
+    return $this->do_pushpull_get();
+  }
+
+  private function do_pushpull_get()
+  {
+    if(file_exists('./plugins/pico_edit/pushpullform.html')) {
+      # Do the git stuff...
+      require_once 'Git-php-lib';
+      $repo = Git::open('.');
+      $remotes = '';
+      try {
+        $remotes_string = $repo->run('remote');
+        $remotes = preg_split('/\s*\r?\n\r?\s*/', $remotes_string, 0, PREG_SPLIT_NO_EMPTY);
+      }
+      catch(Exception $e) {
+        $remotes = array('Failed to get git sources: ' . $e->getMessage());
       }
 
-      die(json_encode($output));
+      $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
+      $twig = new Twig_Environment($loader, array('cache' => null));
+      $twig->addExtension(new Twig_Extension_Debug());
+      $twig_vars = array(
+        'remotes' => $remotes,
+      );
+      $content = $twig->render('pushpullform.html', $twig_vars);
+      die($content);
+    } else {
+      die('Sorry, pushpullform.html was not found in the backend plugin. This is an installation problem.');
+    }
+  }
+
+  private function do_pushpull_post()
+  {
+    if(file_exists('./plugins/pico_edit/pushpullresponse.html')) {
+      # Do the git stuff...
+      require_once 'Git-php-lib';
+      $repo = Git::open('.');
+      $remotes = array();
+      try {
+        $remotes_string = $repo->run('remote');
+        $remotes = preg_split('/\s*\r?\n\r?\s*/', $remotes_string, 0, PREG_SPLIT_NO_EMPTY);
+      }
+      catch(Exception $e) {
+        $status = array('Failed to get git sources: ' . $e->getMessage());
+      }
+
+      $output = 'xyz';
+
+      # Now make the the selected repo is one in the remotes list
+      if(in_array($_REQUEST['remote'], $remotes)) {
+        # Selected repo is acceptable, so go Git push/pull
+
+        try {
+          if($_REQUEST['operation'] == 'push') {
+            $output = $repo->push($_REQUEST['remote'], 'master');
+            error_log("output = $output");
+          } elseif($_REQUEST['operation'] == 'pull') {
+            $output = $repo->pull($_REQUEST['remote'], 'master');
+          } else {
+            $output = 'Sorry, that operation is not allowed';
+          }
+        }
+        catch(Exception $e) {
+          $output = $e->getMessage();
+        }
+      } else {
+        # Not an acceptable remote
+        $output = 'Sorry, that remote is not allowed';
+      }
+
+      # And do output...
+      $loader = new Twig_Loader_Filesystem('./plugins/pico_edit');
+      $twig = new Twig_Environment($loader, array('cache' => null));
+      $twig->addExtension(new Twig_Extension_Debug());
+      $twig_vars = array(
+        'output' => $output,
+      );
+      $content = $twig->render('pushpullresponse.html', $twig_vars);
+      die($content);
+    } else {
+      die('Sorry, pushpullresponse.html was not found in the backend plugin. This is an installation problem.');
+    }
+  }
+
+  private function do_git()
+  {
+    if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+
+    $output = array(
+      'have_git' => 0,
+      'have_repo' => 0,
+      'remotes' => array(),
+    );
+
+    require_once 'Git-php-lib';
+    $output['have_git'] = GitRepo::test_git();
+
+    if($output['have_git']) {
+      try {
+        $repo = Git::open('.');
+        if(Git::is_repo($repo)) {
+          $output['have_repo'] = true;
+
+          $remotes_string = $repo->run('remote');
+          $output['remotes'] = preg_split('/\s*\r?\n\r?\s*/', $remotes_string, 0, PREG_SPLIT_NO_EMPTY);
+        }
+      }
+      catch(Exception $e) { }
     }
 
-    private function slugify( $text ) {
-      // replace non letter or digits by -
-      $text = preg_replace( '~[^\\pL\d]+~u', '-', $text );
-      // trim
-      $text = trim( $text, '-' );
-      // transliterate
-      $text = iconv( 'utf-8', 'us-ascii//TRANSLIT', $text );
-      // lowercase
-      $text = strtolower( $text );
-      // remove unwanted characters
-      $text = preg_replace( '~[^-\w]+~', '', $text );
+    die(json_encode($output));
+  }
 
-      return !empty( $text ) ? $text : FALSE;
-    }
+  private function slugify( $text ) {
+    // replace non letter or digits by -
+    $text = preg_replace( '~[^\\pL\d]+~u', '-', $text );
+    // trim
+    $text = trim( $text, '-' );
+    // transliterate
+    $text = iconv( 'utf-8', 'us-ascii//TRANSLIT', $text );
+    // lowercase
+    $text = strtolower( $text );
+    // remove unwanted characters
+    $text = preg_replace( '~[^-\w]+~', '', $text );
+
+    return !empty( $text ) ? $text : FALSE;
+  }
 }
 
 // This is for Vim users - please don't delete it
