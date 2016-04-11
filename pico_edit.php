@@ -114,7 +114,6 @@ final class Pico_Edit extends AbstractPicoPlugin {
   }
 
   // public function on404ContentLoading( &$file ) { var_dump( $file ); }
-
   // public function onRequestFile( &$file ) { var_dump( $file ); }
 
   public function onRequestUrl( &$url ) {

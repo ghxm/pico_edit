@@ -197,6 +197,10 @@ a:hover, a:active {
      -moz-box-shadow: 0px 1px 1px rgba(0,0,0,0.07);
           box-shadow: 0px 1px 1px rgba(0,0,0,0.07);
 }
+#sidebar .logout { 
+  float: left; 
+  margin-top: 5px;
+}
 #sidebar .controls .new, .commitbutton, .savebutton, .pushpullbutton { 
   float: right; 
   margin-top: 5px;
