@@ -18,7 +18,7 @@ final class Pico_Edit extends AbstractPicoPlugin {
   private $plugin_path = '';
   private $password = '';
 
-  public function before_render( &$twig_vars, &$twig )
+  public function onPageRendering(Twig_Environment &$twig, array &$twig_vars, &$templateName)
   {
     $twig_vars['pico_edit_url'] = $this->getPageUrl( 'pico_edit' );
     if( $this->is_logout ) {
