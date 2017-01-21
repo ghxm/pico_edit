@@ -5,7 +5,7 @@
  * @author Mattia Roccoberton
  * @link http://blocknot.es
  * @license http://opensource.org/licenses/MIT
- * @version 0.2
+ * @version 0.2.2
  */
 
 final class Pico_Edit extends AbstractPicoPlugin {
@@ -523,14 +523,18 @@ final class Pico_Edit extends AbstractPicoPlugin {
     die(json_encode($output));
   }
 
-   private function do_clearcache()
-   {
-     if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
-     $path = $this->getConfig( 'content_dir' ).'/../cache/*';
-     $ret = `rm -rf $path`;
-     // done
-     die($ret);
-   }
+  private function do_clearcache()
+  {
+    if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+    $path = realpath( $this->getConfig( 'content_dir' ) . '/cache' );
+    if( $path !== FALSE )
+    {
+      $path .= '/*';
+      $ret = `rm -rf $path`;  // TODO: improve me using unlink
+    }
+    else $ret = 0;
+    die($ret);
+  }
 
   private function slugify( $text ) {
     // replace non letter or digits by -

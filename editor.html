@@ -9,7 +9,7 @@
 <body>
   <div id="cover"></div>
   <div id="popup">
-    <div class="closegadget"><span class="icon-cross" aria-hiddne="true"></span></div>
+    <div class="closegadget"><span class="icon-cross" aria-hidden="true"></span></div>
     <div class="popupcontent">Loading...</div>
   </div>
   <div id="saving">Saving...</div>
@@ -141,7 +141,7 @@
         editor.emit('autosave');
       });
 
-      // Delete post
+      // btn - Delete
       $('.nav').on('click', '.delete', function(e){
         e.preventDefault();
         if(!confirm('Are you sure you want to delete this file?')) return false;
@@ -158,38 +158,53 @@
         });
       });
 
+      // btn - Save
       $('.controls').on('click', '.savebutton', function(e) {
+        e.preventDefault();
         $('#saving').text('Saving...').addClass('active');
         $.post('{{ pico_edit_url }}/save', { file: $('#epiceditor').data('currentFile'), content: editor.exportFile() }, function(data){
           $('#saving').text('Saved');
           unsaved = false;
           document.title = document.title.replace(' *', '');
           setTimeout(function(){
-                  $('#saving').removeClass('active');
+            $('#saving').removeClass('active');
           }, 1000);
         });
       });
+
+      // btn - Clear cache
       $('.controls').on('click', '.clearcachebutton', function(e) {
-         $('#saving').text('Clearing...').addClass('active');
-         $.post('{{ pico_edit_url }}/clearcache', {}, function(data){
-           $('#saving').text('Cache cleared');
-           setTimeout(function(){
-                   $('#saving').removeClass('active');
-           }, 1000);
-         });
-       });
+        e.preventDefault();
+        $('#saving').text('Clearing...').addClass('active');
+        $.post('{{ pico_edit_url }}/clearcache', {}, function(data){
+          $('#saving').text('Cache cleared');
+          setTimeout(function(){
+            $('#saving').removeClass('active');
+          }, 1000);
+        });
+      });
+
+      // btn - Commit
       $('.controls').on('click', '.commitbutton', function(e) {
+        e.preventDefault();
         open_popup();
         $('.popupcontent').load('{{ pico_edit_url }}/commit');
       });
+
+      // btn - Push / Pull
       $('.controls').on('click', '.pushpullbutton', function(e) {
+        e.preventDefault();
         open_popup();
         $('.popupcontent').load('{{ pico_edit_url }}/pushpull');
       });
+
       $('#popup').on('click', '.closegadget', function(e) {
+        e.preventDefault();
         close_popup();
       });
+
       $('#cover').on('click', function(e) {
+        e.preventDefault();
         close_popup();
       });
 
