@@ -20,6 +20,7 @@
       <a href="#" class="new btn icon-plus marg-r5" title="New"></a>
       <a href="#" class="pushpullbutton btn icon-download2 marg-r5" title="Git Push/Pull"></a>
       <a href="#" class="commitbutton btn icon-upload2 marg-r5" title="Git Commit"></a>
+      <a href="#" class="clearcachebutton btn icon-loop2 marg-r5" title="Clear Cache"></a>
       <a href="{{ pico_edit_url }}/logout" class="logout btn icon-switch" title="Logout"></a>
     </div>
     <ul class="nav0">
@@ -168,6 +169,15 @@
           }, 1000);
         });
       });
+      $('.controls').on('click', '.clearcachebutton', function(e) {
+         $('#saving').text('Clearing...').addClass('active');
+         $.post('{{ pico_edit_url }}/clearcache', {}, function(data){
+           $('#saving').text('Cache cleared');
+           setTimeout(function(){
+                   $('#saving').removeClass('active');
+           }, 1000);
+         });
+       });
       $('.controls').on('click', '.commitbutton', function(e) {
         open_popup();
         $('.popupcontent').load('{{ pico_edit_url }}/commit');

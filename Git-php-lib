@@ -235,7 +235,7 @@ class GitRepo {
 	 * @access  public
 	 * @return  bool
 	 */
-	public function test_git() {
+	public static function test_git() {
 		$descriptorspec = array(
 			1 => array('pipe', 'w'),
 			2 => array('pipe', 'w'),

@@ -137,6 +137,7 @@ final class Pico_Edit extends AbstractPicoPlugin {
     if( $url == 'pico_edit/commit' ) $this->do_commit();
     if( $url == 'pico_edit/git' ) $this->do_git();
     if( $url == 'pico_edit/pushpull' ) $this->do_pushpull();
+    if( $url == 'pico_edit/clearcache' ) $this->do_clearcache();
   }
 
   /**
@@ -521,6 +522,15 @@ final class Pico_Edit extends AbstractPicoPlugin {
 
     die(json_encode($output));
   }
+
+   private function do_clearcache()
+   {
+     if(!isset($_SESSION['backend_logged_in']) || !$_SESSION['backend_logged_in']) die(json_encode(array('error' => 'Error: Unathorized')));
+     $path = $this->getConfig( 'content_dir' ).'/../cache/*';
+     $ret = `rm -rf $path`;
+     // done
+     die($ret);
+   }
 
   private function slugify( $text ) {
     // replace non letter or digits by -
