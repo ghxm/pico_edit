@@ -5,7 +5,8 @@
  * @author Mattia Roccoberton
  * @link http://blocknot.es
  * @license http://opensource.org/licenses/MIT
- * @version 0.2.2
+ * @version 0.3.0
+ * @edited Nepose
  */
 
 final class Pico_Edit extends AbstractPicoPlugin {
@@ -69,7 +70,7 @@ final class Pico_Edit extends AbstractPicoPlugin {
     if( !isset( $config['pico_edit_404'] ) ) $config['pico_edit_404'] = TRUE;
     if( !isset( $config['pico_edit_options'] ) ) $config['pico_edit_options'] = TRUE;
     // Parse extra options
-    $conf = $this->getConfigDir() . '/options.conf';
+    $conf = $this->getConfigDir() . '/config.yml';
     if( !file_exists( $conf ) ) touch( $conf );
     $data = filter_var( file_get_contents( $conf ), FILTER_SANITIZE_STRING );
     foreach( preg_split( "/((\r?\n)|(\r\n?))/", $data ) as $line ) {
@@ -249,9 +250,9 @@ final class Pico_Edit extends AbstractPicoPlugin {
     }
     else if( $this->getConfig( 'pico_edit_options' ) )
     {
-      $conf = $this->getConfigDir() . '/options.conf';
+      $conf = $this->getConfigDir() . '/config.yml';
       if( file_exists( $conf ) ) die( file_get_contents( $conf ) );
-      else die( 'Error: Invalid options file' );
+      else die( 'Error when trying to get config.yml content. PHP-based config is not supported.' );
     }
   }
 
@@ -274,7 +275,7 @@ final class Pico_Edit extends AbstractPicoPlugin {
     }
     else if( $this->getConfig( 'pico_edit_options' ) )
     {
-      $conf = $this->getConfigDir() . '/options.conf';
+      $conf = $this->getConfigDir() . '/config.yml';
       $content = ( isset( $_POST['content'] ) && $_POST['content'] ) ? filter_var( $_POST['content'], FILTER_SANITIZE_STRING ) : '';
       $error = '';
       if( strlen( $content ) !== file_put_contents( $conf, $content ) ) $error = 'Error: cant save changes';
