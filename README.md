@@ -1,50 +1,33 @@
-Pico edit - An admin interface for Pico CMS
-===========================================
-
-A small Back-end for Pico CMS.
+Pico Edit plugin
+================
+Plugin provides a small admin panel for editing page content and CMS configuration.
 
 Install
 -------
 
-1. Clone the Github repo into your 'plugins' directory (so you get a 'pico_edit' subdirectory) OR extract the zip into your 'plugins' directory (and rename the new directory to 'pico_edit')
-2. Open the Pico config.php file and insert your sha256 hashed password
+1. Clone the Github repo into your 'plugins' directory (so you get a 'pico_edit' subdirectory) OR download source code from releases and put it into 'pico_edit' subdir on 'plugins' directory.
+2. Open the config.php file on 'pico_edit' and insert your sha256 hashed password
 3. Visit http://www.yoursite.com/pico_edit and login
 
 If pages editing doesn't work check file/dir permissions of 'content' folder.
 
 About
 -----
-
-Pico Edit provides a back-end interface to edit Pico pages. Additionally, it has the ability to perform some basic Git operations such as commit, push/pull etc.
-
-Features:
+Pico Edit's features:
 
 * Simple and clean interface
-
 * Page create/edit/delete
-
 * Markdown preview (top right icon in the editor)
-
 * Edit 404 page (aka "page not found")
+* Edit Pico's config.yml file.
+* Some basic Git functions such as push, pull etc.
 
-* Edit Pico options
+Add to your config.yml following line to set default author of new pages:
 
-Options (Pico "config/config.php"):
-
-	$config['pico_edit_404'] = true;
-	$config['pico_edit_options'] = false;			// Disallow options editing
-	$config['pico_edit_default_author'] = 'Me';		// Default author for new pages
+        pico_edit_default_author: 'Here put author'
 
 ![Screenshot](https://github.com/blocknotes/pico_edit/blob/master/screenshot.png)
 
-Editing Pico options
---------------------
-
-To override a string option simply write a line with: `theme = default`
-
-To override a boolean option use: `my_option ! true`
-
-Other types of options are not supported.
 
 Git functions
 -------------
@@ -55,6 +38,8 @@ Git features are only shown in the editor UI if the server has a Git binary avai
 
 History
 -------
+
+* This Pico Edit is a fork + modification of [Pico Edit done by blocknotes](https://github.com/blocknotes/pico_edit). It contains possibility to direct edit config.yml instead options.conf file for overwriting.
 
 * Pico Edit is a fork + modifications of [Peeked](https://github.com/coofercat/peeked). It contains minor improvements and some new feature like ability to edit 404 page and Pico options.
 
