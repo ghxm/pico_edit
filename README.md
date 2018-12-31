@@ -1,6 +1,6 @@
 Pico Edit plugin
 ================
-Plugin provides a small admin panel for editing page content and CMS configuration. Now plugin is on **beta testing** so please don't hesitate to let me know when some bug is on it.
+Plugin provides a small admin panel for editing page content and CMS configuration. Now plugin is on beta testing so please don't hesitate to let me know when some bug is on it.
 
 Install
 -------
