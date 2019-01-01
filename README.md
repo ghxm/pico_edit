@@ -5,7 +5,7 @@ Plugin provides a small admin panel for editing page content and CMS configurati
 Install
 -------
 
-1. Set chmod (permissions) to 777 / 766 recursively on config/ and content/ directories. On Windows servers set to read/write for anyone. (In practice 644 will also work on most hostings).
+1. Set chmod (permissions) to 777 / 766 recursively on config/ and content/ directories. On Windows servers set to read/write for anyone. (In practice 644 will also work on most hostings, but 777 may be recommended in some situations).
 2. Clone the Github repo into your 'plugins' directory (so you get a 'pico_edit' subdirectory) OR download source code from releases and put it into 'pico_edit' subdir on 'plugins' directory.
 3. Open the config.php file on 'pico_edit' and insert your sha256 hashed password
 4. Visit http://www.yoursite.com/pico_edit and login
