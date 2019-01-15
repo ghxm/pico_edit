@@ -26,6 +26,9 @@
     <ul class="nav0">
       <li><a href="#" data-url="conf" class="post page-options"><span class="icon-equalizer2 marg-r5" aria-hidden="true"></span><i>configuration file</i></a></li>
       <li><a href="#" data-url="/404" class="post page-404"><span class="icon-file-empty marg-r5" aria-hidden="true"></span><i>404 page</i></a></li>
+      <li><a href="http://picocms.org"><span class="icon-download2 marg-r5" aria-hidden="true"></span><i>download templates and plugins</i></a></li>
+      <li><a href="https://github.com/Nepose/pico_edit"><span class="icon-eye marg-r5" aria-hidden="true"></span><i>plugin version: {{ pico_edit_version }}</i></a></li>
+<!-- <li><a href="checkupdates"><span class="icon-loop2 marg-r5" aria-hidden="true"></span><i>check for updates</i></a></li> -->
     </ul>
     <ul class="nav">
     {% for page in pages %}
@@ -40,7 +43,6 @@
     <div id="epiceditor"></div>
 
     <script src="{{ base_url }}/plugins/pico_edit/libs/jquery-1.12.3.min.js"></script>
-    <!-- <script src="{{ base_url }}/plugins/pico_edit/top_up-1.7.2/top_up-min.js"></script> -->
     <script src="{{ base_url }}/plugins/pico_edit/libs/epiceditor/js/epiceditor.min.js"></script>
     <script>
     $(document).ready(function() {

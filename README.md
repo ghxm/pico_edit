@@ -1,14 +1,20 @@
 Pico Edit plugin
 ================
-Plugin provides a small admin panel for editing page content and CMS configuration. Now plugin is on beta testing so please don't hesitate to let me know when some bug is on it.
+Plugin provides a small admin panel for editing page content and CMS configuration.
 
 Install
 -------
 
-1. Set chmod (permissions) to 777 / 766 recursively on config/ and content/ directories. On Windows servers set to read/write for anyone. (In practice 644 will also work on most hostings, but 777 may be recommended in some situations).
+1. Set permissions of `config/` and `content/` directories to allow read/write (777 or 755 recommended).
 2. Clone the Github repo into your 'plugins' directory (so you get a 'pico_edit' subdirectory) OR download source code from releases and put it into 'pico_edit' subdir on 'plugins' directory.
-3. Open the config.php file on 'pico_edit' and insert your sha256 hashed password
-4. Visit http://www.yoursite.com/pico_edit and login
+3. Open your config.yml file on configuration and add following lines to it:
+```
+	pico_edit_password: put here SHA256 hashed password
+	pico_edit_default_author: put here default author to add for YAML header when creating page
+```
+4. Visit https://www.yoursite.com/pico_edit and login
+
+**Pay attention** if you are installing plugin on a fresh CMS, make sure that you have *config.yml* file and not *config.yml.template*. For well working Pico Edit requires existing configuration file.
 
 About
 -----
@@ -21,11 +27,7 @@ Pico Edit's features:
 * Edit Pico's config.yml file.
 * Some basic Git functions such as push, pull etc.
 
-Add to your config.yml following line to set default author of new pages:
-
-        pico_edit_default_author: 'Here put author'
-
-![Screenshot](https://github.com/blocknotes/pico_edit/blob/master/screenshot.png)
+![Screenshot](https://github.com/Nepose/pico_edit/blob/master/screenshot.png)
 
 Deny access to some files
 -------------------------

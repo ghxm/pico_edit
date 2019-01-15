@@ -2,11 +2,10 @@
 /**
  * Backend plugin for Pico CMS
  *
- * @author Mattia Roccoberton
- * @link http://blocknot.es
+ * @author Mattia Roccoberton, Nepose since v0.3.0
+ * @link https://github.com/Nepose/pico_edit
  * @license http://opensource.org/licenses/MIT
- * @version 0.3.0
- * @edited Nepose
+ * @version 0.4.0
  */
 
 final class Pico_Edit extends AbstractPicoPlugin {
@@ -19,6 +18,7 @@ final class Pico_Edit extends AbstractPicoPlugin {
   private $plugin_path = '';
   private $password = '';
   private $url = 'pico_edit';
+  private $version = '0.4.0';
 
   public function onPageRendering(Twig_Environment &$twig, array &$twig_vars, &$templateName)
   {
@@ -38,7 +38,7 @@ final class Pico_Edit extends AbstractPicoPlugin {
       // $twig_vars['autoescape'] = false;
       $twig_editor->addFilter('var_dump', new Twig_Filter_Function('var_dump'));
       if( !$this->password ) {
-        $twig_vars['login_error'] = 'No password set for the backend.';
+        $twig_vars['login_error'] = 'No password set for the plugin. Edit please your configuration file.';
         echo $twig_editor->render( 'login.html', $twig_vars ); // Render login.html
         exit;
       }
@@ -60,63 +60,23 @@ final class Pico_Edit extends AbstractPicoPlugin {
         }
       }
 
+      $twig_vars['pico_edit_version'] = $this->version;
       echo $twig_editor->render('editor.html', $twig_vars); // Render editor.html
       exit; // Don't continue to render template
+
     }
   }
 
   public function onConfigLoaded( array &$config ) {
-    // Default options
-    if( !isset( $config['pico_edit_404'] ) ) $config['pico_edit_404'] = TRUE;
-    if( !isset( $config['pico_edit_options'] ) ) $config['pico_edit_options'] = TRUE;
-    // Parse extra options
-    $conf = $this->getConfigDir() . '/config.yml';
-    if( !file_exists( $conf ) ) touch( $conf );
-    $data = filter_var( file_get_contents( $conf ), FILTER_SANITIZE_STRING );
-    foreach( preg_split( "/((\r?\n)|(\r\n?))/", $data ) as $line ) {
-      $line_ = trim( $line );
-      if( !empty( $line_ ) )
-      {
-        $pos = strpos( $line_, '=' );
-        if( $pos > 0 )
-        {
-          $key = trim( substr( $line, 0, $pos ) );
-          if( $key && $key[0] != '#' )
-          {
-            $value = trim( substr( $line, $pos + 1 ) );
-            // if( isset( $config[$key] ) )
-            $config[$key] = $value;
-          }
-        }
-        else
-        {
-          $pos = strpos( $line_, '!' );
-          if( $pos > 0 )
-          {
-            $key = trim( substr( $line, 0, $pos ) );
-            if( $key && $key[0] != '#' )
-            {
-              $value = trim( substr( $line, $pos + 1 ) );
-              // if( isset( $config[$key] ) )
-              $config[$key] = ( $value == '1' || $value == 'true' || $value == 'TRUE' || $value == 'yes' || $value == 'YES' || $value == 'on' || $value == 'ON' );
-            }
-          }
-        }
-      }
-    }
-
     $this->plugin_path = dirname( __FILE__ );
-    if( file_exists( $this->plugin_path .'/config.php' ) ) {
-      global $backend_password;
-      global $backend_url;
-      include_once( $this->plugin_path .'/config.php' );
-      $this->password = $backend_password;
-      if (isset($backend_url)) {
-        $this->url = $backend_url;
-      }
-    }
+    $this->password = $config['pico_edit_password'];
+//  $this->username = $config['pico_edit_username'];
     $page_404 = $this->getConfig('content_dir') . '/404.md';
-    if( !file_exists( $page_404 ) ) touch( $page_404 );
+    if( !file_exists( $page_404 ) ) { 
+	    touch( $page_404 );
+	    $temp_404_content = "---\nTitle: Error 404\nRobots: none\n---\n# Error 404\n\nWhoops. Looks like this page doesn't exist.";
+	    file_put_contents( $page_404, $temp_404_content);
+    }
   }
 
   // public function on404ContentLoading( &$file ) { var_dump( $file ); }
@@ -144,6 +104,7 @@ final class Pico_Edit extends AbstractPicoPlugin {
     if( $url == $this->url.'/git' ) $this->do_git();
     if( $url == $this->url.'/pushpull' ) $this->do_pushpull();
     if( $url == $this->url.'/clearcache' ) $this->do_clearcache();
+//    if( $url == $this->url.'/checkupdates' ) $this->is_update_checker = true;
   }
 
   /**
@@ -186,41 +147,9 @@ final class Pico_Edit extends AbstractPicoPlugin {
     }
     $path .= '/' . $file . $this->getConfig( 'content_ext' );
 
-    // TODO: check this part
-
-    // // From the bottom of the $contentDir, look for format templates,
-    // // working upwards until we get to CONTENT_DIR
-    // $template = null;
-    // $workDir = $contentDir;
-    // while(strlen($workDir) >= strlen(CONTENT_DIR)) {
-    //   // See if there's a format template here...?
-    //   if(file_exists($workDir . 'format.templ')) {
-    //     $template = strip_tags(substr($workDir . 'format.templ', strlen(CONTENT_DIR)));
-    //     break;
-    //   }
-    //   // Now strip off the last bit of path from the $workDir
-    //   $workDir = preg_replace('/[^\/]*\/$/', '', $workDir);
-    // }
-
-    // $file .= CONTENT_EXT;
-
-    // $content = null;
-    // if(!is_null($template)) {
-    //   $loader = new Twig_Loader_Filesystem(CONTENT_DIR);
-    //   $twig = new Twig_Environment($loader, array('cache' => null));
-    //   $twig->addExtension(new Twig_Extension_Debug());
-    //   $twig_vars = array(
-    //     'title' => $title,
-    //     'date' => date('j F Y'),
-    //     'time' => date('h:m:s'),
-    //     'author' => 'ralph',
-    //   );
-    //   $content = $twig->render($template, $twig_vars);
-    // }
-
     $error = '';
     // if( is_null( $content ) ) {
-    $content = "/*\nTitle: $name\nAuthor: " . ( $this->getConfig( 'pico_edit_default_author' ) ? $this->getConfig( 'pico_edit_default_author' ) : '' ) . "\nDate: ". date('j F Y') . "\n*/\n\n";
+    $content = "---\nTitle: $name\nAuthor: " . ( $this->getConfig( 'pico_edit_default_author' ) ? $this->getConfig( 'pico_edit_default_author' ) : '' ) . "\n---\n\n";
     // }
 
     if( file_exists( $path ) ) $error = 'Error: A post already exists with this title';
@@ -248,7 +177,7 @@ final class Pico_Edit extends AbstractPicoPlugin {
       if( $file && file_exists( $file ) ) die( file_get_contents( $file ) );
       else die( 'Error: Invalid file' );
     }
-    else if( $this->getConfig( 'pico_edit_options' ) )
+    else
     {
       $conf = $this->getConfigDir() . '/config.yml';
       if( file_exists( $conf ) ) die( file_get_contents( $conf ) );
@@ -273,10 +202,10 @@ final class Pico_Edit extends AbstractPicoPlugin {
         'error' => $error
       )));
     }
-    else if( $this->getConfig( 'pico_edit_options' ) )
+    else
     {
       $conf = $this->getConfigDir() . '/config.yml';
-      $content = ( isset( $_POST['content'] ) && $_POST['content'] ) ? filter_var( $_POST['content'], FILTER_SANITIZE_STRING ) : '';
+      $content = ( isset( $_POST['content'] ) && $_POST['content'] ) ? $_POST['content'] : '';
       $error = '';
       if( strlen( $content ) !== file_put_contents( $conf, $content ) ) $error = 'Error: cant save changes';
       die( json_encode( array( 'content' => $content, 'file' => $conf, 'error' => $error ) ) );
