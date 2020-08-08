@@ -472,16 +472,12 @@ final class Pico_Edit extends AbstractPicoPlugin {
   }
 
   private function slugify( $text ) {
-    // replace non letter or digits by -
-    $text = preg_replace( '~[^\\pL\d]+~u', '-', $text );
+    // replace forbidden characters by -
+    $text = preg_replace( '/[`~!@#\$%^&*=+\\\\|;:\'",\/?()\[\]{}<> \t_-]+/', '-', $text );
     // trim
     $text = trim( $text, '-' );
-    // transliterate
-    $text = iconv( 'utf-8', 'us-ascii//TRANSLIT', $text );
     // lowercase
     $text = strtolower( $text );
-    // remove unwanted characters
-    $text = preg_replace( '~[^-\w]+~', '', $text );
 
     return !empty( $text ) ? $text : FALSE;
   }
