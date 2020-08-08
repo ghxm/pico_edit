@@ -473,7 +473,7 @@ final class Pico_Edit extends AbstractPicoPlugin {
 
   private function slugify( $text ) {
     // replace forbidden characters by -
-    $text = preg_replace( '/[`~!@#\$%^&*=+\\\\|;:\'",\/?()\[\]{}<> \t_-]+/', '-', $text );
+    $text = preg_replace( '/[`~!@#\$%^&*=+\\\\|;:\'",\/?()\[\]{}<> \t_.-]+/', '-', $text );
     // trim
     $text = trim( $text, '-' );
     // lowercase
