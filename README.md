@@ -45,7 +45,7 @@ History
 
 * This Pico Edit is a fork + modification of [Pico Edit done by Nepose](https://github.com/Nepose/pico_edit). It only replaces spaces, tabs, and the following characters for slugifying page titles:
   ```
-  `~!@#$%^&*=+\|;:'",/?()[]{}<>_-
+  `~!@#$%^&*=+\|;:'",/?()[]{}<>_.-
   ```
   It allows non-alphabetic characters (e.g., CJK) in URLs.
 
