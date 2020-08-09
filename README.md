@@ -43,6 +43,12 @@ Git features are only shown in the editor UI if the server has a Git binary avai
 History
 -------
 
+* This Pico Edit is a fork + modification of [Pico Edit done by Nepose](https://github.com/Nepose/pico_edit). It only replaces spaces, tabs, and the following characters for slugifying page titles:
+  ```
+  `~!@#$%^&*=+\|;:'",/?()[]{}<>_-
+  ```
+  It allows non-alphabetic characters (e.g., CJK) in URLs.
+
 * This Pico Edit is a fork + modification of [Pico Edit done by blocknotes](https://github.com/blocknotes/pico_edit). It contains possibility to direct edit config.yml instead options.conf file for overwriting.
 
 * Pico Edit is a fork + modifications of [Peeked](https://github.com/coofercat/peeked). It contains minor improvements and some new feature like ability to edit 404 page and Pico options.
