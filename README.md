@@ -1,6 +1,6 @@
 Pico Edit plugin
 ================
-Plugin provides a small admin panel for editing page content and CMS configuration. This forked version allows non-alphabetic characters (e.g., CJK) in URLs.
+Plugin provides a small admin panel for editing page content and CMS configuration. This forked version allows non-alphabetic characters such as CJK in filenames.
 
 Install
 -------
