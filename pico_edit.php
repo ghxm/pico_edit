@@ -36,7 +36,7 @@ final class Pico_Edit extends AbstractPicoPlugin {
       $loader = new Twig_Loader_Filesystem( $this->plugin_path );
       $twig_editor = new Twig_Environment( $loader, $twig_vars );
       // $twig_vars['autoescape'] = false;
-      $twig_editor->addFilter('var_dump', new Twig_Filter_Function('var_dump'));
+      $twig_editor->addFilter(new Twig_SimpleFilter('var_dump', 'var_dump'));
       if( !$this->password ) {
         $twig_vars['login_error'] = 'No password set for the plugin. Edit please your configuration file.';
         echo $twig_editor->render( 'login.html', $twig_vars ); // Render login.html
