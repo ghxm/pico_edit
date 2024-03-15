@@ -26,6 +26,7 @@ Pico Edit's features:
 * Edit 404 page (aka "page not found")
 * Edit Pico's config.yml file.
 * Some basic Git functions such as push, pull etc.
+* Use content templates for new pages (if _template.md file exists in content directory it will be used as a template for new pages)
 
 ![Screenshot](https://github.com/Nepose/pico_edit/blob/master/screenshot.png)
 

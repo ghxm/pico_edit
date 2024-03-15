@@ -148,9 +148,17 @@ final class Pico_Edit extends AbstractPicoPlugin {
     $path .= '/' . $file . $this->getConfig( 'content_ext' );
 
     $error = '';
-    // if( is_null( $content ) ) {
-    $content = "---\nTitle: $name\nAuthor: " . ( $this->getConfig( 'pico_edit_default_author' ) ? $this->getConfig( 'pico_edit_default_author' ) : '' ) . "\n---\n\n";
-    // }
+
+    // Check if a _template.md file exists in the directory
+    $templatePath = $this->getConfig( 'content_dir' ) . ( !empty( $dir ) ? $dir . '/' : '' ) . '_template.md';
+
+    if (file_exists($templatePath)) {
+        // If _template.md exists, read its contents
+        $content = file_get_contents($templatePath);
+    } else {
+        // If _template.md does not exist, use the default content
+        $content = "---\nTitle: $name\nAuthor: " . ( $this->getConfig( 'pico_edit_default_author' ) ? $this->getConfig( 'pico_edit_default_author' ) : '' ) . "\n---\n\n";
+    }
 
     if( file_exists( $path ) ) $error = 'Error: A post already exists with this title';
     else
