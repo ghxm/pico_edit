@@ -43,6 +43,8 @@ Git features are only shown in the editor UI if the server has a Git binary avai
 History
 -------
 
+* This Pico Edit is a fork + modification of [Pico Edit done by HuidaeCho](https://github.com/HuidaeCho/pico_edit) aiming to make the plugin compatible with Pico 3.0 alpha.
+
 * This Pico Edit is a fork + modification of [Pico Edit done by Nepose](https://github.com/Nepose/pico_edit). It only replaces spaces, tabs, and the following characters for slugifying page titles:
   ```
   `~!@#$%^&*=+\|;:'",/?()[]{}<>_.-
